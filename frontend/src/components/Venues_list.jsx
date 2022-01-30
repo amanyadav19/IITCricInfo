@@ -1,6 +1,7 @@
 import React, {useEffect, useContext} from "react";
 import Path from "../apis/Path";
 import {VenuesContext} from "../context/VenuesContext";
+import {Link} from "react-router-dom";
 
 export const Venues_list = (props) => {
     const {venues, setVenues} = useContext(VenuesContext);
@@ -25,7 +26,7 @@ export const Venues_list = (props) => {
             <tbody>
                 {venues && venues.map(el => {return(
                      <tr key = {el.venue_id}>
-                     <td>{el.venue_name}</td>
+                     <td><Link to="/venue/1"> {el.venue_name} </Link></td>
                  </tr>
                 )
                 })}
