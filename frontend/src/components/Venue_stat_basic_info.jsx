@@ -10,7 +10,6 @@ export const Venue_stat_basic_info = (props) => {
             try{
                 const response = await Path.get(`/venue/info/${parameters.id}`);
                 setVenue(response.data.data.venue);
-                console.log(response.data.data.venue);
             } 
             finally {
             }

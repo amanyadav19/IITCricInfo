@@ -1,5 +1,5 @@
 import React from 'react';
-import CreateVenueForm from '../components/Create_venue_form';
+import CreateVenueForm from '../components/Create_venue_form.jsx';
 
 
 export const Create_venue = () => {

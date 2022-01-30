@@ -7,11 +7,13 @@ import Create_venue from './routes/Create_venue';
 import { VenuesContextProvider } from './context/VenuesContext';
 import { VenueInfoContextProvider } from './context/VenueInfoContext';
 import { VenueMatchOutlineContextProvider } from './context/VenueMatchOutlineContext';
+import { VenueInningContextProvider } from './context/VenueInningContext';
 
 
 
 function App() {
   return (
+    <VenueInningContextProvider>
     <VenueMatchOutlineContextProvider>
     <VenueInfoContextProvider>
     <VenuesContextProvider>
@@ -31,6 +33,7 @@ function App() {
     </VenuesContextProvider>
     </VenueInfoContextProvider>
     </VenueMatchOutlineContextProvider>
+    </VenueInningContextProvider>
   );
 }
 

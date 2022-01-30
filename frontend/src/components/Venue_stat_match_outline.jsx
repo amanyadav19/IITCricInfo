@@ -12,7 +12,6 @@ export const Venue_stat_match_outline = (props) => {
         const fetchData = async() => {
             try{
                 const response = await Path.get(`/venue/outline/${parameters.id}`);
-                console.log(response);
                 setVenueOutline(response.data.data.venue);
             } 
             finally {

@@ -61,6 +61,22 @@ app.get("/venue/outline/:id", async (req, res) => {
     }
 });
 
+// get average first inning score for a venue_id
+app.get("/venue/inning/:id", async (req, res) => {
+    try{
+        const results = await db.query("select season_year, venue.venue_id, venue_name, avg(first_inning_score) as avg_score from (select match_id, sum(runs_scored + extra_runs) as first_inning_score from ball_by_ball where innings_no = 1 group by match_id) as A, match, venue where match.match_id = A.match_id and venue.venue_id = match.venue_id and venue.venue_id = $1 group by(venue.venue_id, season_year);", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "venue": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
 
 
 // adding a venue
