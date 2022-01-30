@@ -10,7 +10,7 @@ export const Create_venue_form = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await Path.post("/venues/", {
+            await Path.post("/venues/", {
                 venue_name: venueName,
                 city_name: cityName,
                 country_name: countryName,

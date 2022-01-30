@@ -8,7 +8,7 @@ export const Venue_stat_basic_info = (props) => {
     useEffect( () => {
         const fetchData = async() => {
             try{
-                const response = await Path.get(`/venue/${parameters.id}`);
+                const response = await Path.get(`/venue/info/${parameters.id}`);
                 setVenue(response.data.data.venue);
                 console.log(response.data.data.venue);
             } 
@@ -19,9 +19,13 @@ export const Venue_stat_basic_info = (props) => {
     }, []);
   return (<div className="list-group">
   <table className="table table-hover bg-primary">
-      <tr><td>{venue.venue_name}</td></tr>
-      <tr><td>{venue.city_name}</td></tr>
-      <tr><td>{venue.country_name}</td></tr>
+      <tr><td>Venue Name</td><td>{venue.venue_name}</td></tr>
+      <tr><td>Venue Address</td><td>{venue.city_name, venue.country_name}</td></tr>
+      <tr><td>Capacity</td><td>{venue.capacity}</td></tr>
+      <tr><td>Total matches played</td><td>{venue.matches_played}</td></tr>
+      <tr><td>Highest total recorded</td><td>{venue.max_total}</td></tr>
+      <tr><td>Lowest total recorded</td><td>{venue.min_total}</td></tr>
+      <tr><td>Highest scored chased</td><td>{venue.max_runs_chased}</td></tr>
   </table>
 </div>);
 };

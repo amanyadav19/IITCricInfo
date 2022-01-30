@@ -27,10 +27,10 @@ app.get("/venues", async (req, res) => {
     
 });
 
-// get a particular venue
-app.get("/venue/:id", async (req, res) => {
+// get a particular venue basic info
+app.get("/venue/info/:id", async (req, res) => {
     try{
-        const results = await db.query("select * from venue where venue_id = $1", [req.params.id]);
+        const results = await db.query("select venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max(total_runs) as max_total, min(total_runs) as min_total, max(runs_chased) as max_runs_chased from venue, (select venue_id, A.match_id, total_runs from (select match_id, sum(runs_scored + extra_runs) as total_runs from ball_by_ball group by match_id) as A, match where A.match_id = match.match_id) as B, (select max(venue_id) as venue_id, A.match_id, max(total_runs) as runs_chased from (select match_id, innings_no, sum(runs_scored + extra_runs) as total_runs from ball_by_ball group by (match_id, innings_no)) as A, match where A.match_id = match.match_id group by A.match_id) as C, (select count(match_id) as matches_played, venue.venue_id from venue, match where venue.venue_id = match.venue_id group by venue.venue_id) as D where venue.venue_id = D.venue_id and venue.venue_id = B.venue_id and venue.venue_id = C.venue_id and venue.venue_id = $1 group by (venue.venue_id, venue_name, city_name, country_name, capacity, matches_played);", [req.params.id]);
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,
@@ -43,6 +43,24 @@ app.get("/venue/:id", async (req, res) => {
         console.log(err);
     }
 });
+
+// get match outline for a venue_id
+app.get("/venue/outline/:id", async (req, res) => {
+    try{
+        const results = await db.query("select venue_id, SUM(CASE WHEN (toss_winner = match_winner and toss_name = 'bat') or (toss_winner != match_winner and toss_name = 'field') THEN 1 ELSE 0 END) as bat_first, SUM(CASE WHEN (toss_winner = match_winner and toss_name = 'field') or (toss_winner != match_winner and toss_name = 'bat') THEN 1 ELSE 0 END) as bat_second from match where venue_id = $1 group by venue_id;", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "venue": results.rows[0],
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
 
 
 // adding a venue

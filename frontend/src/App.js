@@ -6,10 +6,13 @@ import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
 import { VenuesContextProvider } from './context/VenuesContext';
 import { VenueInfoContextProvider } from './context/VenueInfoContext';
+import { VenueMatchOutlineContextProvider } from './context/VenueMatchOutlineContext';
+
 
 
 function App() {
   return (
+    <VenueMatchOutlineContextProvider>
     <VenueInfoContextProvider>
     <VenuesContextProvider>
     <div className='container'>
@@ -27,6 +30,7 @@ function App() {
     </div>
     </VenuesContextProvider>
     </VenueInfoContextProvider>
+    </VenueMatchOutlineContextProvider>
   );
 }
 
