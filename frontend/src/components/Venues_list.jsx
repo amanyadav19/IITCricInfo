@@ -1,5 +1,5 @@
 import React, {useEffect, useContext} from "react";
-import VenueList from "../apis/VenueList";
+import Path from "../apis/Path";
 import {VenuesContext} from "../context/VenuesContext";
 
 export const Venues_list = (props) => {
@@ -7,7 +7,7 @@ export const Venues_list = (props) => {
     useEffect( () => {
         const fetchData = async() => {
             try{
-                const response = await VenueList.get("/");
+                const response = await Path.get("/venues/");
                 setVenues(response.data.data.venues);
             } 
             finally {

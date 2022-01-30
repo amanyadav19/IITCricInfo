@@ -1,6 +1,37 @@
-import React from 'react';
+// import React, {useEffect, useContext} from "react";
+// import VenueList from "../apis/Path";
+// import {VenuesContext} from "../context/VenuesContext";
 
-export default function venue_stat_basic_info() {
-  return <div>basic info</div>;
-}
+// export const Venue_stat_basic_info = (props) => {
+//     const {venues, setVenues} = useContext(VenuesContext);
+//     useEffect( () => {
+//         const fetchData = async() => {
+//             try{
+//                 const response = await VenueList.get("/");
+//                 setVenues(response.data.data.venues);
+//             } 
+//             finally {
+//             }
+//         };
+//         fetchData();
+//     }, []);
+//   return (<div className="list-group">
+//         <table className="table table-hover table-dark">
+//             <thead>
+//                 <tr className="bg-primary">
+//                     <th scope="col">Venue Names</th>
+//                 </tr>
+//             </thead>
+//             <tbody>
+//                 {venues && venues.map(el => {return(
+//                      <tr key = {el.venue_id}>
+//                      <td>{el.venue_name}</td>
+//                  </tr>
+//                 )
+//                 })}
+//             </tbody>
+//         </table>
+//   </div>);
+// };
 
+// export default Venues_list;
