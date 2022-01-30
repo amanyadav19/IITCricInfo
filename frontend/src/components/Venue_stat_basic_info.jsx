@@ -1,37 +1,29 @@
-// import React, {useEffect, useContext} from "react";
-// import VenueList from "../apis/Path";
-// import {VenuesContext} from "../context/VenuesContext";
+import React, {useEffect, useContext} from "react";
+import Path from "../apis/Path";
+import {VenueInfoContext} from "../context/VenueInfoContext";
+import { useParams } from "react-router-dom";
+export const Venue_stat_basic_info = (props) => {
+    const parameters = useParams();
+    const {venue, setVenue} = useContext(VenueInfoContext);
+    useEffect( () => {
+        const fetchData = async() => {
+            try{
+                const response = await Path.get(`/venue/${parameters.id}`);
+                setVenue(response.data.data.venue);
+                console.log(response.data.data.venue);
+            } 
+            finally {
+            }
+        };
+        fetchData();
+    }, []);
+  return (<div className="list-group">
+  <table className="table table-hover bg-primary">
+      <tr><td>{venue.venue_name}</td></tr>
+      <tr><td>{venue.city_name}</td></tr>
+      <tr><td>{venue.country_name}</td></tr>
+  </table>
+</div>);
+};
 
-// export const Venue_stat_basic_info = (props) => {
-//     const {venues, setVenues} = useContext(VenuesContext);
-//     useEffect( () => {
-//         const fetchData = async() => {
-//             try{
-//                 const response = await VenueList.get("/");
-//                 setVenues(response.data.data.venues);
-//             } 
-//             finally {
-//             }
-//         };
-//         fetchData();
-//     }, []);
-//   return (<div className="list-group">
-//         <table className="table table-hover table-dark">
-//             <thead>
-//                 <tr className="bg-primary">
-//                     <th scope="col">Venue Names</th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//                 {venues && venues.map(el => {return(
-//                      <tr key = {el.venue_id}>
-//                      <td>{el.venue_name}</td>
-//                  </tr>
-//                 )
-//                 })}
-//             </tbody>
-//         </table>
-//   </div>);
-// };
-
-// export default Venues_list;
+export default Venue_stat_basic_info;

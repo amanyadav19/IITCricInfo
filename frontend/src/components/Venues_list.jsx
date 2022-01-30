@@ -9,6 +9,7 @@ export const Venues_list = (props) => {
             try{
                 const response = await Path.get("/venues/");
                 setVenues(response.data.data.venues);
+                console.log(venues);
             } 
             finally {
             }

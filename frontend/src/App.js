@@ -5,9 +5,12 @@ import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
 import { VenuesContextProvider } from './context/VenuesContext';
+import { VenueInfoContextProvider } from './context/VenueInfoContext';
+
 
 function App() {
   return (
+    <VenueInfoContextProvider>
     <VenuesContextProvider>
     <div className='container'>
     <head>
@@ -23,6 +26,7 @@ function App() {
       </Router>
     </div>
     </VenuesContextProvider>
+    </VenueInfoContextProvider>
   );
 }
 
