@@ -40,7 +40,7 @@ export const Venue_stat_match_outline = (props) => {
               }
             ]
           }}
-          options={{
+          options={{plugins:{
             title:{
               display:true,
               text:'Match Outline',
@@ -51,7 +51,7 @@ export const Venue_stat_match_outline = (props) => {
               position:'right',
               fontSize:30
             }
-          }}
+          }}}
         />
 </div>);
 };
