@@ -97,6 +97,91 @@ app.post("/venues", async (req, res) => {
     }
 });
 
+// get basic info of player  
+app.get("/players/info/:id", async (req, res) => {
+    try{
+        const results = await db.query("select * from player where player_id = $1;", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "player": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+// get player batting statistics
+app.get("/players/bat_stat/:id", async (req, res) => {
+    try{
+        const results = await db.query("select A.player_id, matches_played, total_runs, fours, sixes, fifties, HS, strike_rate, average from (select player_id, count(match_id) as matches_played from player_match group by player_id) as A, (select striker as player_id, sum(runs_scored) as total_runs, SUM(CASE WHEN runs_scored = 4 THEN 4 ELSE 0 END) as fours, SUM(CASE WHEN runs_scored = 6 THEN 6 ELSE 0 END) as sixes from ball_by_ball group by striker) as B, (select striker as player_id, SUM(CASE WHEN runs_per_match >= 50 THEN 1 ELSE 0 END) as fifties, max(runs_per_match) as HS, sum(runs_per_match)*1.0/sum(balls_faced) * 100.0 as strike_rate from (select match_id, striker, Coalesce(sum(runs_scored), 0) as runs_per_match, count(runs_scored) as balls_faced from ball_by_ball group by (match_id, striker)) as A group by player_id) as C, (select striker as player_id, MAX(A)*1.0/SUM(CASE WHEN B = 0 THEN 1 ELSE B END) as average from (select striker, sum(runs_scored) as A, SUM(CASE WHEN out_type is not null THEN 1 ELSE 0 END) as B  from ball_by_ball group by striker) as C group by striker) as D where A.player_id = B.player_id and B.player_id = C.player_id and C.player_id = D.player_id and A.player_id = $1;", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "player": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+// batting statistics graph 
+app.get("/players/bat_stat_graph/:id", async (req, res) => {
+    try{
+        const results = await db.query("select striker as player_id, match_id, sum(runs_scored) as runs_per_match from ball_by_ball where striker = $1 group by (striker, match_id) order by striker asc, match_id asc;", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "player": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+// bowling statistics  
+app.get("/players/bowl_stat/:id", async (req, res) => {
+    try{
+        const results = await db.query("select A.bowler as player_id, total_matches, runs, balls, overs, wickets, economy, five_wickets from (select bowler, count(distinct match_id) as total_matches, sum(runs_scored + extra_runs) as runs, Count(*) as balls, count(distinct(match_id, innings_no, over_id)) as overs, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets, sum(runs_scored + extra_runs)*1.0/count(distinct(match_id, innings_no, over_id)) as economy from ball_by_ball group by bowler) as A, (select bowler, SUM(CASE WHEN wickets_per_match >= 5 THEN 1 ELSE 0 END) as five_wickets from (select match_id, bowler,SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets_per_match from ball_by_ball group by (match_id, bowler)) as A group by bowler) as B where A.bowler = B.bowler and A.bowler = $1; ", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "player": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+// bowling statistics graph 
+app.get("/players/bowl_stat_graph/:id", async (req, res) => {
+    try{
+        const results = await db.query("select match_id, bowler as playerr_id, sum(runs_scored + extra_runs) as runs_scored, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets from ball_by_ball where bowler = $1 group by (match_id, bowler) order by bowler, match_id;", [req.params.id]);
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "player": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
 const port = process.env.PORT || 3001;
 
 app.listen(port, () => {

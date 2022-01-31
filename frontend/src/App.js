@@ -8,11 +8,18 @@ import { VenuesContextProvider } from './context/VenuesContext';
 import { VenueInfoContextProvider } from './context/VenueInfoContext';
 import { VenueMatchOutlineContextProvider } from './context/VenueMatchOutlineContext';
 import { VenueInningContextProvider } from './context/VenueInningContext';
+import { PlayerInfoContextProvider } from './context/PlayerInfoContext';
+import { PlayerBattingContextProvider } from './context/PlayerBattingContext';
+import { PlayerBowlingContextProvider } from './context/PlayerBowlingContext';
 
+import Player_info from './routes/Player_info';
 
 
 function App() {
   return (
+    <PlayerInfoContextProvider>
+    <PlayerBattingContextProvider>
+    <PlayerBowlingContextProvider>
     <VenueInningContextProvider>
     <VenueMatchOutlineContextProvider>
     <VenueInfoContextProvider>
@@ -26,7 +33,8 @@ function App() {
         <Switch>
           <Route exact path="/venues" component={Venues}/>
           <Route exact path="/venue/:id" component={Venue_stats}/>
-          <Route exact path="/create_venue" component={Create_venue}/>
+          <Route exact path="/venue/create" component={Create_venue}/>
+          <Route exact path="/players/:id" component={Player_info}/>
         </Switch>
       </Router>
     </div>
@@ -34,6 +42,9 @@ function App() {
     </VenueInfoContextProvider>
     </VenueMatchOutlineContextProvider>
     </VenueInningContextProvider>
+    </PlayerBowlingContextProvider>
+    </PlayerBattingContextProvider>
+    </PlayerInfoContextProvider>
   );
 }
 
