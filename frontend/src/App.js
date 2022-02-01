@@ -1,9 +1,11 @@
 import './App.css';
 import React from "react";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom"
+import Matches from './routes/Matches';
 import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
+import { MatchesContextProvider } from './context/MatchesContext';
 import { VenuesContextProvider } from './context/VenuesContext';
 import { VenueInfoContextProvider } from './context/VenueInfoContext';
 import { VenueMatchOutlineContextProvider } from './context/VenueMatchOutlineContext';
@@ -28,6 +30,7 @@ function App() {
     <VenueMatchOutlineContextProvider>
     <VenueInfoContextProvider>
     <VenuesContextProvider>
+    <MatchesContextProvider>
     <div className='container'>
     <head>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
@@ -35,6 +38,7 @@ function App() {
       </head>
       <Router>
         <Switch>
+          <Route exact path="/matches" component={Matches}/>
           <Route exact path="/venues" component={Venues}/>
           <Route exact path="/venue/:id" component={Venue_stats}/>
           <Route exact path="/venue/create" component={Create_venue}/>
@@ -42,6 +46,7 @@ function App() {
         </Switch>
       </Router>
     </div>
+    </MatchesContextProvider>
     </VenuesContextProvider>
     </VenueInfoContextProvider>
     </VenueMatchOutlineContextProvider>
