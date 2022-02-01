@@ -9,6 +9,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
+
 // get all matches
 app.get("/matches", async (req, res) => {
     try{
@@ -192,7 +193,6 @@ app.get("/matches/:id", async (req, res) => {
 // get all venue names
 app.get("/venues", async (req, res) => {
     try{
-        console.log("inside venuesssssssssssss")
         const results = await db.query("select * from venue");
         res.status(200).json({
             status:"sucess",

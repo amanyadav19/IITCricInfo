@@ -13,7 +13,6 @@ export const Venue_stat_match_outline = (props) => {
             try{
                 const response = await Path.get(`/venue/outline/${parameters.id}`);
                 setVenueOutline(response.data.data.venue);
-                // console.console.log(response.data.data.venue);
             } 
             finally {
             }
