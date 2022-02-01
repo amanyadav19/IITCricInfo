@@ -18,13 +18,14 @@ export const PlayerBattingStatistics = (props) => {
     }, []);
   return (<div className="list-group">
   <table className="table table-hover bg-primary">
-      <tr><td>Matches</td><td>{playerBat.matches}</td></tr>
-      <tr><td>Runs</td><td>{playerBat.runs}</td></tr>
-      <tr><td>Four</td><td>{playerBat.four}</td></tr>
-      <tr><td>Six</td><td>{playerBat.bowling_skill}</td></tr>
-      <tr><td>HS</td><td>{playerBat.bowling_skill}</td></tr>
-      <tr><td>Strike rate</td><td>{playerBat.bowling_skill}</td></tr>
-      <tr><td>Average</td><td>{playerBat.bowling_skill}</td></tr>
+      <tr><td>Matches</td><td>{playerBat.matches_played}</td></tr>
+      <tr><td>Runs</td><td>{playerBat.total_runs}</td></tr>
+      <tr><td>Four</td><td>{playerBat.fours}</td></tr>
+      <tr><td>Six</td><td>{playerBat.sixes}</td></tr>
+      <tr><td>Fifty</td><td>{playerBat.fifties}</td></tr>
+      <tr><td>HS</td><td>{playerBat.hs}</td></tr>
+      <tr><td>Strike rate</td><td>{playerBat.strike_rate}</td></tr>
+      <tr><td>Average</td><td>{playerBat.average}</td></tr>
   </table>
 </div>);
 };

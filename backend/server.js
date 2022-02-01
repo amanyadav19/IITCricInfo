@@ -105,7 +105,7 @@ app.get("/players/info/:id", async (req, res) => {
             status:"sucess",
             results: results.rows.length,
             data: {
-                "player": results.rows,
+                "player": results.rows[0],
             },
         });
     }
@@ -122,7 +122,7 @@ app.get("/players/bat_stat/:id", async (req, res) => {
             status:"sucess",
             results: results.rows.length,
             data: {
-                "player": results.rows,
+                "player": results.rows[0],
             },
         });
     }
@@ -156,7 +156,7 @@ app.get("/players/bowl_stat/:id", async (req, res) => {
             status:"sucess",
             results: results.rows.length,
             data: {
-                "player": results.rows,
+                "player": results.rows[0],
             },
         });
     }
@@ -168,7 +168,7 @@ app.get("/players/bowl_stat/:id", async (req, res) => {
 // bowling statistics graph 
 app.get("/players/bowl_stat_graph/:id", async (req, res) => {
     try{
-        const results = await db.query("select match_id, bowler as playerr_id, sum(runs_scored + extra_runs) as runs_scored, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets from ball_by_ball where bowler = $1 group by (match_id, bowler) order by bowler, match_id;", [req.params.id]);
+        const results = await db.query("select match_id, bowler as player_id, sum(runs_scored + extra_runs) as runs_scored, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets from ball_by_ball where bowler = $1 group by (match_id, bowler) order by bowler, match_id;", [req.params.id]);
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,

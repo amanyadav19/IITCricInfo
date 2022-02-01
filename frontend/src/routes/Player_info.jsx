@@ -2,6 +2,9 @@ import React from 'react';
 import PlayerInfo from '../components/PlayerInfo';
 import PlayerBattingStatistics from '../components/PlayerBattingStatistics';
 import PlayerBowlingStatistics from '../components/PlayerBowlingStatistics'; 
+import PlayerBattingGraphStatistics from '../components/PlayerBattingGraphStatistics'; 
+import PlayerBowlingGraphStatistics from '../components/PlayerBowlingGraphStatistics'; 
+
 
 export const Player_info = () => {
   return (<div>
@@ -12,11 +15,13 @@ export const Player_info = () => {
       <h2>
       Player Batting statistics
     </h2>
-      {/* <PlayerBattingStatistics/> */}
+      <PlayerBattingStatistics/>
+      <PlayerBattingGraphStatistics/>
       <h2>
        Player Bowling statistics
     </h2>
-      {/* <PlayerBowlingStatistics/> */}
+      <PlayerBowlingStatistics/>
+      <PlayerBowlingGraphStatistics/>
   </div>);
 };
 

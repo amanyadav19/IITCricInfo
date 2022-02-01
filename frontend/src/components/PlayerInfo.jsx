@@ -10,7 +10,6 @@ export const PlayerInfo = (props) => {
             try{
                 const response = await Path.get(`/players/info/${parameters.id}`);
                 setPlayer(response.data.data.player);
-                console.log(response);
             } 
             finally {
             }

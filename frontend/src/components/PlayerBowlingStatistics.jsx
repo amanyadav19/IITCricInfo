@@ -19,6 +19,7 @@ export const PlayerBowlingStatistics = (props) => {
   return (<div className="list-group">
   <table className="table table-hover bg-primary">
       <tr><td>Matches</td><td>Runs</td><td>Wickets</td><td>Overs</td><td>Balls</td><td>Economy</td><td>Five Wickets</td></tr>
+      <tr><td>{playerBowl.total_matches}</td><td>{playerBowl.runs}</td><td>{playerBowl.wickets}</td><td>{playerBowl.overs}</td><td>{playerBowl.balls}</td><td>{playerBowl.economy}</td><td>{playerBowl.five_wickets}</td></tr>
   </table>
 </div>);
 };

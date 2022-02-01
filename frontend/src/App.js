@@ -11,12 +11,16 @@ import { VenueInningContextProvider } from './context/VenueInningContext';
 import { PlayerInfoContextProvider } from './context/PlayerInfoContext';
 import { PlayerBattingContextProvider } from './context/PlayerBattingContext';
 import { PlayerBowlingContextProvider } from './context/PlayerBowlingContext';
+import { PlayerBattingGraphContextProvider } from './context/PlayerBattingGraphContext';
+import { PlayerBowlingGraphContextProvider } from './context/PlayerBowlingGraphContext';
 
 import Player_info from './routes/Player_info';
 
 
 function App() {
   return (
+    <PlayerBattingGraphContextProvider>
+    <PlayerBowlingGraphContextProvider>
     <PlayerInfoContextProvider>
     <PlayerBattingContextProvider>
     <PlayerBowlingContextProvider>
@@ -45,6 +49,8 @@ function App() {
     </PlayerBowlingContextProvider>
     </PlayerBattingContextProvider>
     </PlayerInfoContextProvider>
+    </PlayerBowlingGraphContextProvider>
+    </PlayerBattingGraphContextProvider>
   );
 }
 
