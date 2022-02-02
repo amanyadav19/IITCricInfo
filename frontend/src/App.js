@@ -15,7 +15,9 @@ import { PlayerBattingContextProvider } from './context/PlayerBattingContext';
 import { PlayerBowlingContextProvider } from './context/PlayerBowlingContext';
 import { PlayerBattingGraphContextProvider } from './context/PlayerBattingGraphContext';
 import { PlayerBowlingGraphContextProvider } from './context/PlayerBowlingGraphContext';
+import { InningContextProvider } from './context/InningContext';
 
+import Match_info from './routes/Match_info';
 import Player_info from './routes/Player_info';
 
 
@@ -31,6 +33,7 @@ function App() {
     <VenueInfoContextProvider>
     <VenuesContextProvider>
     <MatchesContextProvider>
+    <InningContextProvider>
     <div className='container'>
     <head>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
@@ -39,6 +42,7 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/matches" component={Matches}/>
+          <Route exact path="/matches/:id" component={Match_info}/>
           <Route exact path="/venues" component={Venues}/>
           <Route exact path="/venue/:id" component={Venue_stats}/>
           <Route exact path="/venue/create" component={Create_venue}/>
@@ -46,6 +50,7 @@ function App() {
         </Switch>
       </Router>
     </div>
+    </InningContextProvider>
     </MatchesContextProvider>
     </VenuesContextProvider>
     </VenueInfoContextProvider>

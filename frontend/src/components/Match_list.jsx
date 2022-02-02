@@ -19,7 +19,7 @@ export const Match_list = (props) => {
     }, []);
 
     const handleMatchSelect = (id) => {
-        history.push(`/match/${id}`);
+        history.push(`/match/${id}`); //////////// see this
     }
   return (<div className="list-group">
         <table className="table table-hover table-dark">

@@ -12,7 +12,6 @@ app.use(express.json());
 // get all matches
 app.get("/matches", async (req, res) => {
     try{
-        console.log("inside matches")
         const results = await db.query("SELECT * FROM match");
         res.status(200).json({
             status:"sucess",
@@ -21,7 +20,67 @@ app.get("/matches", async (req, res) => {
                 "matches": results.rows,
             },
         });
-        console.log(results.rows);
+    }
+    catch(err) {
+        console.log(err);
+    }
+    
+});
+
+// get match info
+app.get("/matches/:id", async (req, res) => {
+    try{
+        const i1_batter = await db.query(
+          `SELECT player_id, player_name, runs, balls_faced, strike_rate
+            FROM player
+            INNER JOIN
+            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+            FROM
+            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
+            GROUP BY striker) AS t2) AS t3
+            ON player.player_id = t3.batter;`,
+            [req.params.id]
+        );
+        const i2_batter = await db.query(
+          `SELECT player_id, player_name, runs, balls_faced, strike_rate
+            FROM player
+            INNER JOIN
+            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+            FROM
+            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
+            GROUP BY striker) AS t2) AS t3
+            ON player.player_id = t3.batter;`,
+          [req.params.id]
+        );
+
+        const i1_bowler = await db.query(
+          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no=1
+            GROUP BY bowler;`,
+          [req.params.id]
+        );
+
+        const i2_bowler = await db.query(
+          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no=2
+            GROUP BY bowler;`,
+          [req.params.id]
+        );
+
+        res.status(200).json({
+            status:"sucess",
+            results: i1_batter.rows.length,  ///////////////////  see what to set this to /////////
+            data: {
+                "inningOneBatter": i1_batter.rows,
+                "inningTwoBatter": i2_batter.rows,
+                "inningOneBowler": i1_bowler.rows,
+                "inningTwoBowler": i2_bowler.rows,
+            },
+        });
     }
     catch(err) {
         console.log(err);

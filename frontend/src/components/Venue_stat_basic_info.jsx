@@ -19,7 +19,7 @@ export const Venue_stat_basic_info = (props) => {
   return (<div className="list-group">
   <table className="table table-hover bg-primary">
       <tr><td>Venue Name</td><td>{venue.venue_name}</td></tr>
-      <tr><td>Venue Address</td><td>{venue.city_name, venue.country_name}</td></tr>
+      <tr><td>Venue Address</td><td>{venue.city_name}, {venue.country_name}</td></tr>
       <tr><td>Capacity</td><td>{venue.capacity}</td></tr>
       <tr><td>Total matches played</td><td>{venue.matches_played}</td></tr>
       <tr><td>Highest total recorded</td><td>{venue.max_total}</td></tr>
