@@ -7,13 +7,20 @@ import 'chart.js/auto';
 
 export const Match_Summary_Stats = (props) => {
     const parameters = useParams();
-    const {matchSummary, setMatchSummary} = useContext(MatchSummaryContext);
+    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo } = useContext(MatchSummaryContext);
+    const [ matchSummary, setMatchSummary] = MatchSummary
+    const [ extraRuns, setExtraRuns] = ExtraRuns
+    const [ matchSummaryTwo, setMatchSummaryTwo] = MatchSummaryTwo
+    const [ extraRunsTwo, setExtraRunsTwo] = ExtraRunsTwo
+
     useEffect( () => {
         const fetchData = async() => {
             try{
-                const response = await Path.get(`/venue/outline/${parameters.id}`); //////////
-                setMatchSummary(response.data.data.venue); ////////////////
-                // console.console.log(response.data.data.venue);
+                const response = await Path.get(`/matches/match_summary/${parameters.id}`);
+                setMatchSummary(response.data.data.summaryOne);
+                setExtraRuns(response.data.data.extraRunsOne)
+                setMatchSummaryTwo(response.data.data.summaryTwo);
+                setExtraRunsTwo(response.data.data.extraRunsTwo)
             } 
             finally {
             }
@@ -23,7 +30,7 @@ export const Match_Summary_Stats = (props) => {
   return (<div class="w-50 container fluid" >
      <Pie
           data={{
-            labels: ['Ones', 'Two', 'Fours', 'Sixes', 'Extra Runs'],
+            labels: matchSummary.map(el => el.runtype),
             datasets: [
               {
                 label: 'Match Outline',
@@ -40,7 +47,44 @@ export const Match_Summary_Stats = (props) => {
                 '#4B5000',
                 '#175000'
                 ],
-                data: [10, 20, 30, 40, 50]
+                data: matchSummary.map(el => el.runscored)
+              }
+            ]
+          }}
+          options={{plugins:{
+            title:{
+              display:true,
+              text:'Match Outline',
+              fontSize:30
+            },
+            legend:{
+              display:true,
+              position:'right',
+              fontSize:30
+            }
+          }}}
+        />
+
+    <Pie
+          data={{
+            labels: matchSummaryTwo.map(el => el.runtype),
+            datasets: [
+              {
+                label: 'Match Outline',
+                backgroundColor: [
+                  'rgb(255, 205, 86)',
+                  '#B21F00',
+                  '#C9DE00',
+                  '#2FDE00',
+                  'rgb(255, 99, 132)',
+                  'rgb(54, 162, 235)',
+                ],
+                hoverBackgroundColor: [
+                '#501800',
+                '#4B5000',
+                '#175000'
+                ],
+                data: matchSummaryTwo.map(el => el.runscored)
               }
             ]
           }}

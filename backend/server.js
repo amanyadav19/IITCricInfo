@@ -66,6 +66,67 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
   }
 });
 
+// get match summary stats
+app.get("/matches/match_summary/:id", async (req, res) => {
+    try{
+        const summaryOne = await db.query(
+          `
+            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
+            FROM ball_by_ball
+            WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
+            GROUP BY runs_scored
+            ORDER BY runType;
+        `,
+          [req.params.id]
+        );
+
+        const summaryTwo = await db.query(
+          `
+            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
+            FROM ball_by_ball
+            WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
+            GROUP BY runs_scored
+            ORDER BY runType;
+        `,
+          [req.params.id]
+        );
+
+        const extraRunsOne = await db.query(
+          `
+            SELECT SUM(extra_runs) as runs
+            FROM ball_by_ball
+            Where match_id = $1 AND innings_no=1;
+        `,
+          [req.params.id]
+        );
+
+        const extraRunsTwo = await db.query(
+          `
+            SELECT SUM(extra_runs) as runs
+            FROM ball_by_ball
+            Where match_id = $1 AND innings_no=2;
+        `,
+          [req.params.id]
+        );
+
+        res.status(200).json({
+          status: "sucess",
+          results: summaryOne.rows.length,
+          data: {
+            summaryOne: summaryOne.rows,
+            summaryTwo: summaryTwo.rows,
+            extraRunsOne: extraRunsOne.rows,
+            extraRunsTwo: extraRunsTwo.rows,
+          },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+    
+});
+
+
 // get match info
 app.get("/matches/:id", async (req, res) => {
     try{

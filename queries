@@ -41,7 +41,12 @@ LIMIT 3;
 ----------------------Pie Chart Runs Scored-------------------------
 SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
 FROM ball_by_ball
-WHERE match_id=829712 AND innings_no=1 AND runs_scored!=0
+WHERE match_id=501210 AND innings_no=1 AND runs_scored!=0
 GROUP BY runs_scored
 ORDER BY runType;
 
+
+--------------------- Pie Chart Extra Runs------------------------
+SELECT SUM(extra_runs)
+FROM ball_by_ball
+Where match_id = 1082593 AND innings_no=1;
