@@ -1,6 +1,7 @@
 import React from 'react';
 import MatchStats from '../components/MatchStats';
 import ScoreComparison from '../components/ScoreComparison';
+import Match_Summary_Stats from '../components/MatchSummaryStats';
 // import PlayerInfo from '../components/PlayerInfo';
 // import PlayerBattingStatistics from '../components/PlayerBattingStatistics';
 // import PlayerBowlingStatistics from '../components/PlayerBowlingStatistics'; 
@@ -14,6 +15,8 @@ export const Match_info = () => {
       <MatchStats />
     <h2>Score Comparison</h2>
       <ScoreComparison />
+    <h2>Match Summary</h2>
+      <Match_Summary_Stats />
     {/* <h2>
       Player Basic Information
     </h2>

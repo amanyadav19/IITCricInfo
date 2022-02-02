@@ -5,6 +5,7 @@ import Matches from './routes/Matches';
 import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
+import { MatchSummaryContextProvider } from './context/MatchSummaryContext';
 import { ScoreComparisonContextProvider } from "./context/ScoreComparisonContext";
 import { MatchesContextProvider } from './context/MatchesContext';
 import { VenuesContextProvider } from './context/VenuesContext';
@@ -35,6 +36,7 @@ function App() {
     <MatchesContextProvider>
     <MatchContextProvider>
     <ScoreComparisonContextProvider>
+    <MatchSummaryContextProvider>
     <div className='container'>
     <head>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
@@ -51,6 +53,7 @@ function App() {
         </Switch>
       </Router>
     </div>
+    </MatchSummaryContextProvider>
     </ScoreComparisonContextProvider>
     </MatchContextProvider>
     </MatchesContextProvider>
