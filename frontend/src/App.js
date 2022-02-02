@@ -5,6 +5,7 @@ import Matches from './routes/Matches';
 import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
+import { ScoreComparisonContextProvider } from "./context/ScoreComparisonContext";
 import { MatchesContextProvider } from './context/MatchesContext';
 import { VenuesContextProvider } from './context/VenuesContext';
 import { VenueInfoContextProvider } from './context/VenueInfoContext';
@@ -20,7 +21,6 @@ import { MatchContextProvider } from './context/MatchContext';
 import Match_info from './routes/Match_info';
 import Player_info from './routes/Player_info';
 
-
 function App() {
   return (
     <PlayerBattingGraphContextProvider>
@@ -34,6 +34,7 @@ function App() {
     <VenuesContextProvider>
     <MatchesContextProvider>
     <MatchContextProvider>
+    <ScoreComparisonContextProvider>
     <div className='container'>
     <head>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
@@ -50,6 +51,7 @@ function App() {
         </Switch>
       </Router>
     </div>
+    </ScoreComparisonContextProvider>
     </MatchContextProvider>
     </MatchesContextProvider>
     </VenuesContextProvider>

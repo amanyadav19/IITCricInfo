@@ -27,6 +27,32 @@ app.get("/matches", async (req, res) => {
     
 });
 
+// get Score Comaprison Graph Stats for a match
+app.get("/matches/score_comparison/:id", async (req, res) => {
+  try {
+    const results = await db.query(
+      `
+        select over_id, SUM(runs_scored+extra_runs) as runs
+        from ball_by_ball
+        where match_id = $1 and innings_no = 1
+        group by over_id
+        order by over_id;    
+    `,
+      [req.params.id]
+    );
+    console.log(results.rows);
+    res.status(200).json({
+      status: "sucess",
+      results: results.rows.length,
+      data: {
+        comparison: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 // get match info
 app.get("/matches/:id", async (req, res) => {
     try{
@@ -92,6 +118,7 @@ app.get("/matches/:id", async (req, res) => {
 // get all venue names
 app.get("/venues", async (req, res) => {
     try{
+        console.log("inside venuesssssssssssss")
         const results = await db.query("select * from venue");
         res.status(200).json({
             status:"sucess",

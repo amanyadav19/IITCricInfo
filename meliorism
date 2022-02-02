@@ -1,1 +1,6 @@
 1. Should display all the batters in the inning even if did not bat?
+2. Add states and other stuff for the match info.
+3. Moving score comparison below the matches/id makes the server non responsive towards score comparison
+4. cirrect the spelling from bat graph to bar graph
+
+
