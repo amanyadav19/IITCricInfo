@@ -7,14 +7,16 @@ import { Line, } from "react-chartjs-2";
 
 export const ScoreComparison = (props) => {
     const parameters = useParams();
-    const { scoreComparison, setScoreComparison } = useContext(ScoreComparisonContext);
+    const { scoreComparison, scoreComparisonTwo } = useContext(ScoreComparisonContext);
+    const [ firstInningRuns, setFirstInningRuns] = scoreComparison
+    const [ secondInningRuns, setSecondInningRuns] = scoreComparisonTwo
 
     useEffect( () => {
         const fetchData = async() => {
             try{
                 const response = await Path.get(`/matches/score_comparison/${parameters.id}`);
-                setScoreComparison(response.data.data.comparison);
-                // console.console.log(response.data.results);
+                setFirstInningRuns(response.data.data.inningOne);
+                setSecondInningRuns(response.data.data.inningTwo);
             } 
             finally {
             }
@@ -25,21 +27,21 @@ export const ScoreComparison = (props) => {
   <div className="list-group">
         <Line
         data={{
-            labels: scoreComparison.map(el => el.over_id),
+            labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
             datasets: [
             {
                 label: 'Runs',
                 backgroundColor: 'rgba(75,192,192,1)',
                 borderColor: 'rgba(0,0,0,1)',
                 borderWidth: 2,
-                data: scoreComparison.map(el => el.runs)
+                data: firstInningRuns.map(el => el.runs)
             },
             {
                 label: 'Runs',
                 backgroundColor: 'rgba(75,192,192,1)',
                 borderColor: 'rgba(0,0,0,1)',
                 borderWidth: 2,
-                data: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]
+                data: secondInningRuns.map(el => el.runs)
             }
             ]
         }}

@@ -30,7 +30,7 @@ app.get("/matches", async (req, res) => {
 // get Score Comaprison Graph Stats for a match
 app.get("/matches/score_comparison/:id", async (req, res) => {
   try {
-    const results = await db.query(
+    const inningOne = await db.query(
       `
         select over_id, SUM(runs_scored+extra_runs) as runs
         from ball_by_ball
@@ -40,12 +40,25 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
     `,
       [req.params.id]
     );
-    console.log(results.rows);
+
+    const inningTwo = await db.query(
+      `
+        select over_id, SUM(runs_scored+extra_runs) as runs
+        from ball_by_ball
+        where match_id = $1 and innings_no = 2
+        group by over_id
+        order by over_id;    
+    `,
+      [req.params.id]
+    );
+
+    console.log(inningOne.rows);
     res.status(200).json({
       status: "sucess",
-      results: results.rows.length,
+      results: inningOne.rows.length,
       data: {
-        comparison: results.rows,
+        inningOne: inningOne.rows,
+        inningTwo: inningTwo.rows,
       },
     });
   } catch (err) {
