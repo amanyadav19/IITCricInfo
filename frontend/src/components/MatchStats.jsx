@@ -1,11 +1,11 @@
 import React, {useEffect, useContext} from "react";
 import Path from "../apis/Path";
-import { InningContext } from "../context/InningContext";
+import { MatchContext } from "../context/MatchContext";
 import { useParams } from "react-router-dom";
 
-export const InningStats = (props) => {
+export const MatchStats = (props) => {
     const parameters = useParams();
-    const { FirstBat, FirstBowl, SecondBat, SecondBowl } = useContext(InningContext)
+    const { FirstBat, FirstBowl, SecondBat, SecondBowl } = useContext(MatchContext)
     const [firstInningBat, setFirstInningBat] = FirstBat;
     const [firstInningBowl, setFirstInningBowl] = FirstBowl;
     const [secondInningBat, setSecondInningBat] = SecondBat;
@@ -123,6 +123,6 @@ export const InningStats = (props) => {
 </div>);
 };
 
-export default InningStats;
+export default MatchStats;
 
 

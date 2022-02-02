@@ -1,5 +1,5 @@
 import React from 'react';
-import InningStats from '../components/InningStats';
+import MatchStats from '../components/MatchStats';
 // import PlayerInfo from '../components/PlayerInfo';
 // import PlayerBattingStatistics from '../components/PlayerBattingStatistics';
 // import PlayerBowlingStatistics from '../components/PlayerBowlingStatistics'; 
@@ -10,7 +10,7 @@ import InningStats from '../components/InningStats';
 export const Match_info = () => {
   return (<div>
     <h2>Scoreboard</h2>
-        <InningStats />
+        <MatchStats />
     {/* <h2>
       Player Basic Information
     </h2>
