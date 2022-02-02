@@ -50,3 +50,92 @@ ORDER BY runType;
 SELECT SUM(extra_runs)
 FROM ball_by_ball
 Where match_id = 1082593 AND innings_no=1;
+
+
+
+
+
+
+
+
+---------------------------PART D QUERY -------------------------------------
+
+
+
+SELECT team.team_id, team_name, COALESCE(won, 0) AS won
+FROM team
+LEFT JOIN
+	(SELECT match_winner AS team_id, COUNT(*) AS won
+	FROM match
+	WHERE season_year=2013
+	GROUP BY match_winner) AS t1
+ON team.team_id = t1.team_id;
+
+
+--- matches played ----------
+SELECT team.team_id, team_name, COUNT(*) AS match_played
+FROM team, match
+WHERE season_year = 2013 AND (team_id = team1 OR team_id = team2)
+GROUP BY team.team_id, team.team_name;
+
+------WON matches ---------
+SELECT team_id, team_name, won, (won*2) AS points
+FROM
+	(SELECT team.team_id, team_name, COALESCE(won, 0) AS won
+	FROM team
+	LEFT JOIN
+		(SELECT match_winner AS team_id, COUNT(*) AS won
+		FROM match
+		WHERE season_year=2013
+		GROUP BY match_winner) AS t1
+	ON team.team_id = t1.team_id) AS t2
+ORDER BY points DESC;
+
+
+---------- LOST -----------------
+SELECT team.team_id, team.team_name, COUNT(*) AS lost
+FROM team
+INNER JOIN
+	(SELECT *
+	FROM match
+	WHERE season_year=2013) AS t0
+ON (team.team_id = t0.team1 OR team.team_id = t0.team2) AND team.team_id!=t0.match_winner
+GROUP BY team.team_id, team.team_name
+;
+
+
+-------------- played, won, lost------------------------
+SELECT t6.team_id, t6.team_name, t6.match_played, t6.won, COALESCE(lost, 0) AS lost, t6.points
+FROM
+	(SELECT t4.team_id, t4.team_name, match_played, won, points
+	FROM
+		(SELECT team.team_id, team_name, COUNT(*) AS match_played
+		FROM team, match
+		WHERE season_year = 2013 AND (team_id = team1 OR team_id = team2)
+		GROUP BY team.team_id, team.team_name) AS t4
+	INNER JOIN
+		(SELECT team_id, team_name, won, (won*2) AS points
+		FROM
+			(SELECT team.team_id, team_name, COALESCE(won, 0) AS won
+			FROM team
+			LEFT JOIN
+				(SELECT match_winner AS team_id, COUNT(*) AS won
+				FROM match
+				WHERE season_year=2013
+				GROUP BY match_winner) AS t1
+			ON team.team_id = t1.team_id) AS t2
+		ORDER BY points DESC) AS t3
+	ON t4.team_id = t3.team_id) AS t6
+LEFT JOIN
+	(SELECT team.team_id, team.team_name, COUNT(*) AS lost
+	FROM team
+	INNER JOIN
+		(SELECT *
+		FROM match
+		WHERE season_year=2013) AS t0
+	ON (team.team_id = t0.team1 OR team.team_id = t0.team2) AND team.team_id!=t0.match_winner
+	GROUP BY team.team_id, team.team_name) AS t5
+ON t5.team_id=t6.team_id
+;
+
+------------------ NRR query -------------
