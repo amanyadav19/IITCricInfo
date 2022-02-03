@@ -104,7 +104,7 @@ GROUP BY team.team_id;
 
 
 -------------- played, won, lost------------------------
-SELECT t3.team_id, t3.team_name, t3.match_played, t3.won, COALESCE(won, 0) AS lost
+SELECT t3.team_id, t3.team_name, t3.match_played, t3.won, COALESCE(lost, 0) AS lost
 FROM
 	(SELECT t1.team_id, t1.team_name, match_played, COALESCE(won, 0) AS won
 	FROM
