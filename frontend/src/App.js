@@ -5,6 +5,7 @@ import Matches from './routes/Matches';
 import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
 import Create_venue from './routes/Create_venue';
+import { PointsTabelContextProvider } from './context/PtsTableContext';
 import { MatchSummaryContextProvider } from './context/MatchSummaryContext';
 import { ScoreComparisonContextProvider } from "./context/ScoreComparisonContext";
 import { MatchesContextProvider } from './context/MatchesContext';
@@ -21,6 +22,7 @@ import { MatchContextProvider } from './context/MatchContext';
 
 import Match_info from './routes/Match_info';
 import Player_info from './routes/Player_info';
+import Points_Table from './routes/Points_Table';
 
 function App() {
   return (
@@ -37,6 +39,7 @@ function App() {
     <MatchContextProvider>
     <ScoreComparisonContextProvider>
     <MatchSummaryContextProvider>
+    <PointsTabelContextProvider>
     <div className='container'>
     <head>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
@@ -50,9 +53,11 @@ function App() {
           <Route exact path="/venue/:id" component={Venue_stats}/>
           <Route exact path="/venue/create" component={Create_venue}/>
           <Route exact path="/players/:id" component={Player_info}/>
+          <Route exact path="/pointstable/:year" component={Points_Table}/>
         </Switch>
       </Router>
     </div>
+    </PointsTabelContextProvider>
     </MatchSummaryContextProvider>
     </ScoreComparisonContextProvider>
     </MatchContextProvider>
