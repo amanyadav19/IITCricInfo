@@ -1,0 +1,94 @@
+SELECT tb1.team_id, tb1.team_name, match_played, won, lost, nrr
+FROM
+	(SELECT t3.team_id, t3.team_name, t3.match_played, t3.won, COALESCE(won, 0) AS lost
+	FROM
+		(SELECT t1.team_id, t1.team_name, match_played, COALESCE(won, 0) AS won
+		FROM
+			(SELECT team.team_id, team_name, COUNT(*) AS match_played
+			FROM team, match
+			WHERE season_year = 2013 AND (team_id = team1 OR team_id = team2)
+			GROUP BY team.team_id, team.team_name) AS t1
+		LEFT JOIN
+			(SELECT match_winner AS team_id, COUNT(*) AS won
+			FROM match
+			WHERE season_year=2013
+			GROUP BY match_winner) AS t2
+		ON t1.team_id = t2.team_id) AS t3
+	LEFT JOIN
+		(SELECT team.team_id, COUNT(*) AS lost
+		FROM team
+		INNER JOIN
+			(SELECT *
+			FROM match
+			WHERE season_year=2013) AS t0
+		ON (team.team_id = t0.team1 AND t0.team2 = t0.match_winner) OR (team.team_id = t0.team2 AND t0.team1 = t0.match_winner)
+		GROUP BY team.team_id) AS t4
+	ON t3.team_id = t4.team_id) AS tb1
+INNER JOIN
+(SELECT team_id, team_name, ROUND((((1.0*total_runs_scored)/total_overs_faced) - ((1.0*total_runs_scored_against)/total_overs_faced_against)),2) AS NRR
+FROM
+	(SELECT t6.team_id, t6.team_name, total_runs_scored, total_overs_faced, total_runs_scored_against, total_overs_faced_against
+	FROM
+		(SELECT team_id, team_name, SUM(runs_scored) AS total_runs_scored, SUM(overs_faced) AS total_overs_faced
+		FROM(
+			(SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+			FROM
+				(SELECT *
+				FROM
+					(SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+					FROM team, match
+					WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=2013
+					ORDER BY team.team_id) AS t1
+				WHERE (toss_winner=team_id AND toss_name='bat') OR (toss_winner!=team_id AND toss_name='field')) AS t2
+			INNER JOIN ball_by_ball
+			ON t2.match_id = ball_by_ball.match_id
+			WHERE innings_no=1
+			GROUP BY t2.team_id, t2.team_name, t2.match_id)
+			UNION
+			(SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+			FROM
+				(SELECT *
+				FROM
+					(SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+					FROM team, match
+					WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=2013
+					ORDER BY team.team_id) AS t1
+				WHERE (toss_winner=team_id AND toss_name='field') OR (toss_winner!=team_id AND toss_name='bat')) AS t2
+			INNER JOIN ball_by_ball
+			ON t2.match_id = ball_by_ball.match_id
+			WHERE innings_no=2
+			GROUP BY t2.team_id, t2.team_name, t2.match_id)) AS t3
+		GROUP BY team_id, team_name) AS t6
+	INNER JOIN
+		(SELECT team_id, team_name, SUM(runs_scored_against) AS total_runs_scored_against, SUM(overs_faced_against) AS total_overs_faced_against
+		FROM(
+			(SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+			FROM
+				(SELECT *
+				FROM
+					(SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+					FROM team, match
+					WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=2013
+					ORDER BY team.team_id) AS t1
+				WHERE (toss_winner=team_id AND toss_name='bat') OR (toss_winner!=team_id AND toss_name='field')) AS t2
+			INNER JOIN ball_by_ball
+			ON t2.match_id = ball_by_ball.match_id
+			WHERE innings_no=2
+			GROUP BY t2.team_id, t2.team_name, t2.match_id)
+			UNION
+			(SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+			FROM
+				(SELECT *
+				FROM
+					(SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+					FROM team, match
+					WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=2013
+					ORDER BY team.team_id) AS t1
+				WHERE (toss_winner=team_id AND toss_name='field') OR (toss_winner!=team_id AND toss_name='bat')) AS t2
+			INNER JOIN ball_by_ball
+			ON t2.match_id = ball_by_ball.match_id
+			WHERE innings_no=1
+			GROUP BY t2.team_id, t2.team_name, t2.match_id)) AS t3
+		GROUP BY team_id, team_name) AS t7
+	ON t6.team_id=t7.team_id) AS t8) AS tb2
+ON tb1.team_id = tb2.team_id;
