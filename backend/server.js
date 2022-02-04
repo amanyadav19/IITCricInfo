@@ -9,6 +9,305 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
+
+// get all matches
+app.get("/matches", async (req, res) => {
+    try{
+        const results = await db.query("SELECT * FROM match");
+        res.status(200).json({
+            status:"sucess",
+            results: results.rows.length,
+            data: {
+                "matches": results.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+    
+});
+
+// get Score Comaprison Graph Stats for a match
+app.get("/matches/score_comparison/:id", async (req, res) => {
+  try {
+    const inningOne = await db.query(
+      `
+        select over_id, SUM(runs_scored+extra_runs) as runs
+        from ball_by_ball
+        where match_id = $1 and innings_no = 1
+        group by over_id
+        order by over_id;    
+    `,
+      [req.params.id]
+    );
+
+    const inningTwo = await db.query(
+      `
+        select over_id, SUM(runs_scored+extra_runs) as runs
+        from ball_by_ball
+        where match_id = $1 and innings_no = 2
+        group by over_id
+        order by over_id;    
+    `,
+      [req.params.id]
+    );
+
+    console.log(inningOne.rows);
+    res.status(200).json({
+      status: "sucess",
+      results: inningOne.rows.length,
+      data: {
+        inningOne: inningOne.rows,
+        inningTwo: inningTwo.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// get match summary stats
+app.get("/matches/match_summary/:id", async (req, res) => {
+    try{
+        const summaryOne = await db.query(
+          `
+            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
+            FROM ball_by_ball
+            WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
+            GROUP BY runs_scored
+            ORDER BY runType;
+        `,
+          [req.params.id]
+        );
+
+        const summaryTwo = await db.query(
+          `
+            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
+            FROM ball_by_ball
+            WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
+            GROUP BY runs_scored
+            ORDER BY runType;
+        `,
+          [req.params.id]
+        );
+
+        const extraRunsOne = await db.query(
+          `
+            SELECT SUM(extra_runs) as runs
+            FROM ball_by_ball
+            Where match_id = $1 AND innings_no=1;
+        `,
+          [req.params.id]
+        );
+
+        const extraRunsTwo = await db.query(
+          `
+            SELECT SUM(extra_runs) as runs
+            FROM ball_by_ball
+            Where match_id = $1 AND innings_no=2;
+        `,
+          [req.params.id]
+        );
+
+        res.status(200).json({
+          status: "sucess",
+          results: summaryOne.rows.length,
+          data: {
+            summaryOne: summaryOne.rows,
+            summaryTwo: summaryTwo.rows,
+            extraRunsOne: extraRunsOne.rows,
+            extraRunsTwo: extraRunsTwo.rows,
+          },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+    
+});
+
+
+// get match info
+app.get("/matches/:id", async (req, res) => {
+    try{
+        const i1_batter = await db.query(
+          `SELECT player_id, player_name, runs, balls_faced, strike_rate
+            FROM player
+            INNER JOIN
+            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+            FROM
+            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
+            GROUP BY striker) AS t2) AS t3
+            ON player.player_id = t3.batter;`,
+            [req.params.id]
+        );
+        const i2_batter = await db.query(
+          `SELECT player_id, player_name, runs, balls_faced, strike_rate
+            FROM player
+            INNER JOIN
+            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+            FROM
+            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
+            GROUP BY striker) AS t2) AS t3
+            ON player.player_id = t3.batter;`,
+          [req.params.id]
+        );
+
+        const i1_bowler = await db.query(
+          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no=1
+            GROUP BY bowler;`,
+          [req.params.id]
+        );
+
+        const i2_bowler = await db.query(
+          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no=2
+            GROUP BY bowler;`,
+          [req.params.id]
+        );
+
+        res.status(200).json({
+            status:"sucess",
+            results: i1_batter.rows.length,  ///////////////////  see what to set this to /////////
+            data: {
+                "inningOneBatter": i1_batter.rows,
+                "inningTwoBatter": i2_batter.rows,
+                "inningOneBowler": i1_bowler.rows,
+                "inningTwoBowler": i2_bowler.rows,
+            },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+    
+});
+
+
+// get points table
+app.get("/pointstable/:year", async (req, res) => {
+  try {
+    const results = await db.query(
+      `
+        SELECT tb1.team_id, tb1.team_name, match_played, won, lost, tied, nrr, pts
+        FROM
+            (SELECT team_id, team_name, match_played, won, lost, (2*won) AS pts, (match_played-won-lost) AS tied
+            FROM
+                (SELECT t3.team_id, t3.team_name, t3.match_played, t3.won, COALESCE(lost, 0) AS lost
+                FROM
+                    (SELECT t1.team_id, t1.team_name, match_played, COALESCE(won, 0) AS won
+                    FROM
+                        (SELECT team.team_id, team_name, COUNT(*) AS match_played
+                        FROM team, match
+                        WHERE season_year = $1 AND (team_id = team1 OR team_id = team2)
+                        GROUP BY team.team_id, team.team_name) AS t1
+                    LEFT JOIN
+                        (SELECT match_winner AS team_id, COUNT(*) AS won
+                        FROM match
+                        WHERE season_year=$1
+                        GROUP BY match_winner) AS t2
+                    ON t1.team_id = t2.team_id) AS t3
+                LEFT JOIN
+                    (SELECT team.team_id, COUNT(*) AS lost
+                    FROM team
+                    INNER JOIN
+                        (SELECT *
+                        FROM match
+                        WHERE season_year=$1) AS t0
+                    ON (team.team_id = t0.team1 AND t0.team2 = t0.match_winner) OR (team.team_id = t0.team2 AND t0.team1 = t0.match_winner)
+                    GROUP BY team.team_id) AS t4
+                ON t3.team_id = t4.team_id) AS t5) AS tb1
+        INNER JOIN
+        (SELECT team_id, team_name, ROUND((((1.0*total_runs_scored)/total_overs_faced) - ((1.0*total_runs_scored_against)/total_overs_faced_against)),2) AS NRR
+        FROM
+            (SELECT t6.team_id, t6.team_name, total_runs_scored, total_overs_faced, total_runs_scored_against, total_overs_faced_against
+            FROM
+                (SELECT team_id, team_name, SUM(runs_scored) AS total_runs_scored, SUM(overs_faced) AS total_overs_faced
+                FROM(
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+                    FROM
+                        (SELECT *
+                        FROM
+                            (SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+                            FROM team, match
+                            WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=$1
+                            ORDER BY team.team_id) AS t1
+                        WHERE (toss_winner=team_id AND toss_name='bat') OR (toss_winner!=team_id AND toss_name='field')) AS t2
+                    INNER JOIN ball_by_ball
+                    ON t2.match_id = ball_by_ball.match_id
+                    WHERE innings_no=1
+                    GROUP BY t2.team_id, t2.team_name, t2.match_id)
+                    UNION
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+                    FROM
+                        (SELECT *
+                        FROM
+                            (SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+                            FROM team, match
+                            WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=$1
+                            ORDER BY team.team_id) AS t1
+                        WHERE (toss_winner=team_id AND toss_name='field') OR (toss_winner!=team_id AND toss_name='bat')) AS t2
+                    INNER JOIN ball_by_ball
+                    ON t2.match_id = ball_by_ball.match_id
+                    WHERE innings_no=2
+                    GROUP BY t2.team_id, t2.team_name, t2.match_id)) AS t3
+                GROUP BY team_id, team_name) AS t6
+            INNER JOIN
+                (SELECT team_id, team_name, SUM(runs_scored_against) AS total_runs_scored_against, SUM(overs_faced_against) AS total_overs_faced_against
+                FROM(
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+                    FROM
+                        (SELECT *
+                        FROM
+                            (SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+                            FROM team, match
+                            WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=$1
+                            ORDER BY team.team_id) AS t1
+                        WHERE (toss_winner=team_id AND toss_name='bat') OR (toss_winner!=team_id AND toss_name='field')) AS t2
+                    INNER JOIN ball_by_ball
+                    ON t2.match_id = ball_by_ball.match_id
+                    WHERE innings_no=2
+                    GROUP BY t2.team_id, t2.team_name, t2.match_id)
+                    UNION
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+                    FROM
+                        (SELECT *
+                        FROM
+                            (SELECT team.team_id, team.team_name, match_id, team1, team2, toss_winner, toss_name
+                            FROM team, match
+                            WHERE (team.team_id = team1 or team.team_id = team2) AND season_year=$1
+                            ORDER BY team.team_id) AS t1
+                        WHERE (toss_winner=team_id AND toss_name='field') OR (toss_winner!=team_id AND toss_name='bat')) AS t2
+                    INNER JOIN ball_by_ball
+                    ON t2.match_id = ball_by_ball.match_id
+                    WHERE innings_no=1
+                    GROUP BY t2.team_id, t2.team_name, t2.match_id)) AS t3
+                GROUP BY team_id, team_name) AS t7
+            ON t6.team_id=t7.team_id) AS t8) AS tb2
+        ON tb1.team_id = tb2.team_id
+        ORDER BY pts DESC, nrr DESC;
+    `,
+      [req.params.year]
+    );
+    res.status(200).json({
+      status: "sucess",
+      results: results.rows.length,
+      data: {
+        results: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
 // get all venue names
 app.get("/venues", async (req, res) => {
     try{
