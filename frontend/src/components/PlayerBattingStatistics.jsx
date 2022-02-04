@@ -9,6 +9,7 @@ export const PlayerBattingStatistics = (props) => {
         const fetchData = async() => {
             try{
                 const response = await Path.get(`/players/bat_stat/${parameters.id}`);
+                console.log(response.data.data.player)
                 setPlayerBat(response.data.data.player);
             } 
             finally {

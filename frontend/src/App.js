@@ -51,7 +51,7 @@ function App() {
           <Route exact path="/matches/:id" component={Match_info}/>
           <Route exact path="/venues" component={Venues}/>
           <Route exact path="/venue/:id" component={Venue_stats}/>
-          <Route exact path="/venue/create" component={Create_venue}/>
+          <Route exact path="/venues/add" component={Create_venue}/>
           <Route exact path="/players/:id" component={Player_info}/>
           <Route exact path="/pointstable/:year" component={Points_Table}/>
         </Switch>

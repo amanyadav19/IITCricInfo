@@ -26,7 +26,7 @@ export const Venue_stat_average_first_inning = (props) => {
             labels: venueInning.map(el => el.season_year),
             datasets: [
               {
-                label: venueInning.map(el => el.venue_name)[0],
+                label: venueInning.map(el => el.venue_name)[0] || 'no venue',
                 fill: false,
                 lineTension: 0.5,
                 backgroundColor: 'rgba(75,192,192,1)',

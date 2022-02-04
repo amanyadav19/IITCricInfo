@@ -9,6 +9,7 @@ export const Venue_stat_basic_info = (props) => {
         const fetchData = async() => {
             try{
                 const response = await Path.get(`/venue/info/${parameters.id}`);
+                console.log(response.data.data.venue);
                 setVenue(response.data.data.venue);
             } 
             finally {
