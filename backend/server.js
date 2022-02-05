@@ -152,27 +152,65 @@ app.get("/matches/match_summary/:id", async (req, res) => {
 app.get("/matches/:id", async (req, res) => {
     try{
         const i1_batter = await db.query(
-          `SELECT player_id, player_name, runs, balls_faced, strike_rate
-            FROM player
-            INNER JOIN
-            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+          `
+            SELECT player_id, player_name, runs, balls_faced, strike_rate, fours, COALESCE(sixes, 0) as sixes
             FROM
-            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
-            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
-            GROUP BY striker) AS t2) AS t3
-            ON player.player_id = t3.batter;`,
-            [req.params.id]
+                (SELECT t4.player_id, t4.player_name, t4.runs, t4.balls_faced, strike_rate, COALESCE(fours, 0) AS fours
+                FROM
+                    (SELECT player_id, player_name, runs, balls_faced, strike_rate
+                    FROM player
+                    INNER JOIN
+                        (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+                        FROM
+                            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+                            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
+                            GROUP BY striker) AS t2) AS t3
+                    ON player.player_id = t3.batter) AS t4
+                LEFT JOIN
+                    (SELECT striker as batter, count(*) as fours
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=1 AND runs_scored = 4
+                    GROUP BY striker) AS t5
+                ON t4.player_id = t5.batter) AS t7
+            LEFT JOIN
+                (SELECT striker as batter, count(*) as sixes
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=1 AND runs_scored = 6
+                GROUP BY striker) AS t6
+            ON t7.player_id = t6.batter
+            ORDER BY runs DESC;            
+          `,
+          [req.params.id]
         );
         const i2_batter = await db.query(
-          `SELECT player_id, player_name, runs, balls_faced, strike_rate
-            FROM player
-            INNER JOIN
-            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+          `
+            SELECT player_id, player_name, runs, balls_faced, strike_rate, fours, COALESCE(sixes, 0) AS sixes
             FROM
-            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
-            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
-            GROUP BY striker) AS t2) AS t3
-            ON player.player_id = t3.batter;`,
+                (SELECT t4.player_id, t4.player_name, t4.runs, t4.balls_faced, strike_rate, COALESCE(fours, 0) AS fours
+                FROM
+                    (SELECT player_id, player_name, runs, balls_faced, strike_rate
+                    FROM player
+                    INNER JOIN
+                        (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+                        FROM
+                            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+                            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
+                            GROUP BY striker) AS t2) AS t3
+                    ON player.player_id = t3.batter) AS t4
+                LEFT JOIN
+                    (SELECT striker as batter, count(*) as fours
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=2 AND runs_scored = 4
+                    GROUP BY striker) AS t5
+                ON t4.player_id = t5.batter) AS t7
+            LEFT JOIN
+                (SELECT striker as batter, count(*) as sixes
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=2 AND runs_scored = 6
+                GROUP BY striker) AS t6
+            ON t7.player_id = t6.batter
+            ORDER BY runs DESC;
+            `,
           [req.params.id]
         );
 
@@ -192,15 +230,47 @@ app.get("/matches/:id", async (req, res) => {
           [req.params.id]
         );
 
+
+
+        const first_batting_bowling = await db.query(
+          `
+            SELECT first_batting, team_name as first_bowling
+            FROM team
+            INNER JOIN
+                (SELECT firstbatting, firstbowling, team_name as first_batting
+                FROM team
+                INNER JOIN
+                    (SELECT Firstbatting,
+                        CASE 
+                            WHEN Firstbatting=team1 THEN team2
+                            ELSE team1
+                        END
+                        AS Firstbowling
+                    FROM
+                        (SELECT team1, team2, toss_winner, toss_name,
+                            CASE
+                                WHEN ((team1=toss_winner AND toss_name='bat') OR (team2=toss_winner AND toss_name='field')) THEN team1
+                                ELSE team2
+                            END
+                            AS Firstbatting
+                        FROM match
+                        WHERE match_id = $1) AS t1) AS t2
+                ON team.team_id = t2.firstbatting) AS t3
+            ON team.team_id = t3.firstbowling;
+        `,
+          [req.params.id]
+        );
+
         res.status(200).json({
-            status:"sucess",
-            results: i1_batter.rows.length,  ///////////////////  see what to set this to /////////
-            data: {
-                "inningOneBatter": i1_batter.rows,
-                "inningTwoBatter": i2_batter.rows,
-                "inningOneBowler": i1_bowler.rows,
-                "inningTwoBowler": i2_bowler.rows,
-            },
+          status: "sucess",
+          results: i1_batter.rows.length, ///////////////////  see what to set this to /////////
+          data: {
+            inningOneBatter: i1_batter.rows,
+            inningTwoBatter: i2_batter.rows,
+            inningOneBowler: i1_bowler.rows,
+            inningTwoBowler: i2_bowler.rows,
+            firstBattingBowling: first_batting_bowling.rows,
+          },
         });
     }
     catch(err) {

@@ -7,6 +7,7 @@ export const MatchContextProvider = (props) => {
   const [firstInningBowl, setFirstInningBowl] = useState([]);
   const [secondInningBat, setSecondInningBat] = useState([]);
   const [secondInningBowl, setSecondInningBowl] = useState([]);
+  const [firstBattingBowling, setFirstBattingBowling] = useState([]);
 
   return (
     <MatchContext.Provider
@@ -15,6 +16,7 @@ export const MatchContextProvider = (props) => {
         FirstBowl: [firstInningBowl, setFirstInningBowl],
         SecondBat: [secondInningBat, setSecondInningBat],
         SecondBowl: [secondInningBowl, setSecondInningBowl],
+        FirstBattingBowling: [firstBattingBowling, setFirstBattingBowling],
       }}
     >
       {props.children}
