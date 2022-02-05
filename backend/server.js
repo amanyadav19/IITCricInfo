@@ -329,23 +329,23 @@ app.get("/venues", async (req, res) => {
 // get a particular venue basic info
 app.get("/venue/info/:id", async (req, res) => {
     try{
-        var results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max(total_runs) as max_total, min(total_runs) as min_total, max(runs_chased) as max_runs_chased
+        var results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max(total_runs) as max_total, min(total_runs) as min_total, max_runs_chased
         from
         venue, (select venue_id, A.match_id, total_runs
                 from 
                     (select match_id, sum(runs_scored + extra_runs) as total_runs 
                     from 
                     ball_by_ball group by match_id) as A, match where A.match_id = match.match_id) as B, 
-                (select max(venue_id) as venue_id, A.match_id, max(total_runs) as runs_chased 
+                (select cast($1 as int) as venue_id, coalesce(max(runs_chased),0) as max_runs_chased from (select max(venue_id) as venue_id, A.match_id, max(total_runs) as runs_chased 
                 from 
-                    (select match_id , sum(runs_scored + extra_runs)+1 as total_runs 
+                    (select match_id , sum(runs_scored + extra_runs) as total_runs 
                     from ball_by_ball where innings_no = 1 group by match_id) as A, match 
-                where A.match_id = match.match_id group by A.match_id) as C, 
+                where A.match_id = match.match_id and ((toss_winner != match_winner and toss_name = 'bat') or  (toss_winner = match_winner and toss_name = 'field')) group by A.match_id) as F where venue_id = $1) as C, 
                 (select count(match_id) as matches_played, venue.venue_id 
                 from
                 venue, match where venue.venue_id = match.venue_id group by venue.venue_id) as D 			
         where 
-        venue.venue_id = D.venue_id and venue.venue_id = B.venue_id and venue.venue_id = C.venue_id and venue.venue_id = $1 group by (venue.venue_id, venue_name, city_name, country_name, capacity, matches_played);`, [req.params.id]);
+        venue.venue_id = D.venue_id and venue.venue_id = B.venue_id and venue.venue_id = C.venue_id and venue.venue_id = $1 group by (venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max_runs_chased);`, [req.params.id]);
         if(results.rows.length == 0) { 
             results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, '0' as matches_played, '0' as max_total, '0' as min_total, '0' as max_runs_chased
             from
