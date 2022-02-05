@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 export const Match_Summary_Stats = (props) => {
     const parameters = useParams();
     const history = useHistory();
-    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler } = useContext(MatchSummaryContext);
+    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler, Won } = useContext(MatchSummaryContext);
     const [ matchSummary, setMatchSummary] = MatchSummary
     const [ extraRuns, setExtraRuns] = ExtraRuns
     const [ matchSummaryTwo, setMatchSummaryTwo] = MatchSummaryTwo
@@ -18,6 +18,7 @@ export const Match_Summary_Stats = (props) => {
     const [inningTwoBatter, setInningTwoBatter] = InningTwoBatter;
     const [inningOneBowler, setInningOneBowler] = InningOneBowler;
     const [inningTwoBowler, setInningTwoBowler] = InningTwoBowler;
+    const [ won, setWon ] = Won
 
     useEffect( () => {
         const fetchData = async() => {
@@ -31,6 +32,7 @@ export const Match_Summary_Stats = (props) => {
                 setInningTwoBatter(response.data.data.inningTwoBatter);
                 setInningOneBowler(response.data.data.inningOneBowler);
                 setInningTwoBowler(response.data.data.inningTwoBowler);
+                setWon(response.data.data.won);
             } 
             finally {
             }
@@ -212,6 +214,10 @@ export const Match_Summary_Stats = (props) => {
           }}}
         />
 </div>
+
+            {won && won.map(el => {return(
+            <>{el.won}</>
+            )})}
 </>
 );
 };

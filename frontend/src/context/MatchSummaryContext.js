@@ -11,6 +11,7 @@ export const MatchSummaryContextProvider = (props) => {
   const [inningTwoBatter, setInningTwoBatter] = useState([]);
   const [inningOneBowler, setInningOneBowler] = useState([]);
   const [inningTwoBowler, setInningTwoBowler] = useState([]);
+  const [won, setWon] = useState([]);
 
   return (
     <MatchSummaryContext.Provider
@@ -23,6 +24,7 @@ export const MatchSummaryContextProvider = (props) => {
         InningTwoBatter: [inningTwoBatter, setInningTwoBatter],
         InningOneBowler: [inningOneBowler, setInningOneBowler],
         InningTwoBowler: [inningTwoBowler, setInningTwoBowler],
+        Won: [ won, setWon],
       }}
     >
       {props.children}

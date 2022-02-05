@@ -254,6 +254,24 @@ app.get("/matches/match_summary/:id", async (req, res) => {
           [req.params.id]
         );
 
+
+
+        const won = await db.query(
+        `
+        SELECT concat(team_name, ' won by ', win_margin, ' ', win_type) AS won
+        FROM
+        (SELECT team_name, win_type, win_margin
+        FROM
+            (SELECT match_winner, win_type, win_margin
+            FROM match
+            WHERE match_id = $1) AS t1
+        INNER JOIN team
+        ON t1.match_winner=team.team_id) AS t2;
+        `,
+          [req.params.id]
+        );
+
+
         res.status(200).json({
           status: "sucess",
           results: summaryOne.rows.length,
@@ -266,6 +284,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             inningTwoBatter: inningTwoBatter.rows,
             inningOneBowler: inningOneBowler.rows,
             inningTwoBowler: inningTwoBowler.rows,
+            won: won.rows,
           },
         });
     }

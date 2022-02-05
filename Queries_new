@@ -291,3 +291,18 @@ INNER JOIN
 ON player.player_id = t2.bowler
 ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
 LIMIT 3;
+
+
+
+
+------------------ WON QUERY ------------------
+
+SELECT concat(team_name, ' won by ', win_margin, ' ', win_type) AS won
+FROM
+(SELECT team_name, win_type, win_margin
+FROM
+	(SELECT match_winner, win_type, win_margin
+	FROM match
+	WHERE match_id = $1) AS t1
+INNER JOIN team
+ON t1.match_winner=team.team_id) AS t2;
