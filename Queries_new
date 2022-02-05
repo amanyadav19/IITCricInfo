@@ -251,3 +251,43 @@ LEFT JOIN
 	GROUP BY over_id) AS t3
 ON t1.over_id = t3.over_id
 ORDER BY t1.over_id;
+
+
+
+MATCH SUMMARY Query
+
+---------------------BATTING--------------------------------
+SELECT player_name, player_id, total_runs_scored, balls_faced
+FROM player
+INNER JOIN
+	(SELECT striker, SUM(runs_scored) AS total_runs_scored, COUNT(*) AS balls_faced
+	FROM ball_by_ball
+	WHERE match_id = $1 AND innings_no = 1
+	GROUP BY striker) AS t0
+ON player.player_id = t0.striker
+ORDER BY total_runs_scored DESC, balls_faced ASC, player_name ASC
+LIMIT 3;
+
+
+
+----------------------Bowling-------------------------------
+
+SELECT player_name, player_id, wickets_taken, runs_given
+FROM
+	player
+INNER JOIN
+	(SELECT t0.bowler, wickets_taken, runs_given
+	FROM
+		(SELECT bowler, COUNT(*) AS wickets_taken
+		FROM ball_by_ball
+		WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+		GROUP BY bowler) AS t0
+	LEFT JOIN 
+		(SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+		FROM ball_by_ball
+		WHERE match_id=$1 AND innings_no=1
+		GROUP BY bowler) AS t1
+	ON t0.bowler = t1.bowler) AS t2
+ON player.player_id = t2.bowler
+ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
+LIMIT 3;

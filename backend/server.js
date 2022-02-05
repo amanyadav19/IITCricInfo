@@ -172,6 +172,88 @@ app.get("/matches/match_summary/:id", async (req, res) => {
           [req.params.id]
         );
 
+        const inningOneBatter = await db.query(
+        `
+        SELECT player_name, player_id, total_runs_scored, balls_faced
+        FROM player
+        INNER JOIN
+            (SELECT striker, SUM(runs_scored) AS total_runs_scored, COUNT(*) AS balls_faced
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no = 1
+            GROUP BY striker) AS t0
+        ON player.player_id = t0.striker
+        ORDER BY total_runs_scored DESC, balls_faced ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
+        const inningTwoBatter = await db.query(
+        `
+        SELECT player_name, player_id, total_runs_scored, balls_faced
+        FROM player
+        INNER JOIN
+            (SELECT striker, SUM(runs_scored) AS total_runs_scored, COUNT(*) AS balls_faced
+            FROM ball_by_ball
+            WHERE match_id = $1 AND innings_no=2
+            GROUP BY striker) AS t0
+        ON player.player_id = t0.striker
+        ORDER BY total_runs_scored DESC, balls_faced ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
+        const inningOneBowler = await db.query(
+        `
+        SELECT player_name, player_id, wickets_taken, runs_given
+        FROM
+            player
+        INNER JOIN
+            (SELECT t0.bowler, wickets_taken, runs_given
+            FROM
+                (SELECT bowler, COUNT(*) AS wickets_taken
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                GROUP BY bowler) AS t0
+            LEFT JOIN 
+                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                FROM ball_by_ball
+                WHERE match_id=$1 AND innings_no=1
+                GROUP BY bowler) AS t1
+            ON t0.bowler = t1.bowler) AS t2
+        ON player.player_id = t2.bowler
+        ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
+        const inningTwoBowler = await db.query(
+        `
+        SELECT player_name, player_id, wickets_taken, runs_given
+        FROM
+            player
+        INNER JOIN
+            (SELECT t0.bowler, wickets_taken, runs_given
+            FROM
+                (SELECT bowler, COUNT(*) AS wickets_taken
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                GROUP BY bowler) AS t0
+            LEFT JOIN 
+                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                FROM ball_by_ball
+                WHERE match_id=$1 AND innings_no=2
+                GROUP BY bowler) AS t1
+            ON t0.bowler = t1.bowler) AS t2
+        ON player.player_id = t2.bowler
+        ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
         res.status(200).json({
           status: "sucess",
           results: summaryOne.rows.length,
@@ -180,6 +262,10 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             summaryTwo: summaryTwo.rows,
             extraRunsOne: extraRunsOne.rows,
             extraRunsTwo: extraRunsTwo.rows,
+            inningOneBatter: inningOneBatter.rows,
+            inningTwoBatter: inningTwoBatter.rows,
+            inningOneBowler: inningOneBowler.rows,
+            inningTwoBowler: inningTwoBowler.rows,
           },
         });
     }

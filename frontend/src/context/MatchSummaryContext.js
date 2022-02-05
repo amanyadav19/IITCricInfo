@@ -7,6 +7,10 @@ export const MatchSummaryContextProvider = (props) => {
   const [ extraRuns, setExtraRuns ] = useState([]);
   const [ matchSummaryTwo, setMatchSummaryTwo ] = useState([]);
   const [ extraRunsTwo, setExtraRunsTwo ] = useState([]);
+  const [inningOneBatter, setInningOneBatter] = useState([]);
+  const [inningTwoBatter, setInningTwoBatter] = useState([]);
+  const [inningOneBowler, setInningOneBowler] = useState([]);
+  const [inningTwoBowler, setInningTwoBowler] = useState([]);
 
   return (
     <MatchSummaryContext.Provider
@@ -15,6 +19,10 @@ export const MatchSummaryContextProvider = (props) => {
         ExtraRuns: [extraRuns, setExtraRuns],
         MatchSummaryTwo: [matchSummaryTwo, setMatchSummaryTwo],
         ExtraRunsTwo: [extraRunsTwo, setExtraRunsTwo],
+        InningOneBatter: [inningOneBatter, setInningOneBatter],
+        InningTwoBatter: [inningTwoBatter, setInningTwoBatter],
+        InningOneBowler: [inningOneBowler, setInningOneBowler],
+        InningTwoBowler: [inningTwoBowler, setInningTwoBowler],
       }}
     >
       {props.children}
