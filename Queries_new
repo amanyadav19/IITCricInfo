@@ -85,7 +85,8 @@ ORDER BY runs DESC;
 
 
 
---------------FIRST BATTING FIRST BOWLING ------------------------SELECT first_batting, team_name as first_bowling
+--------------FIRST BATTING FIRST BOWLING ------------------------
+SELECT first_batting, team_name as first_bowling
 FROM team
 INNER JOIN
 	(SELECT firstbatting, firstbowling, team_name as first_batting
@@ -109,3 +110,144 @@ INNER JOIN
 	ON team.team_id = t2.firstbatting) AS t3
 ON team.team_id = t3.firstbowling;
 
+
+
+-------------------------- RUNS EXTRA WICKETS DATA OF THE MATCH --------------------------------
+
+SELECT *
+FROM
+	(SELECT first_batting, team_name as first_bowling
+	FROM team
+	INNER JOIN
+		(SELECT firstbatting, firstbowling, team_name as first_batting
+		FROM team
+		INNER JOIN
+			(SELECT Firstbatting,
+				CASE 
+					WHEN Firstbatting=team1 THEN team2
+					ELSE team1
+				END
+				AS Firstbowling
+			FROM
+				(SELECT team1, team2, toss_winner, toss_name,
+					CASE
+						WHEN ((team1=toss_winner AND toss_name='bat') OR (team2=toss_winner AND toss_name='field')) THEN team1
+						ELSE team2
+					END
+					AS Firstbatting
+				FROM match
+				WHERE match_id = $1) AS t1) AS t2
+		ON team.team_id = t2.firstbatting) AS t3
+	ON team.team_id = t3.firstbowling) AS t8
+CROSS JOIN
+	(SELECT *
+	FROM
+		(SELECT *
+		FROM
+			(SELECT COUNT(*) AS second_innings_wicket
+			FROM ball_by_ball
+			WHERE match_id = $1 and innings_no=2 and out_type!='NULL') AS t1
+		CROSS JOIN
+			(SELECT SUM(extra_runs) AS innings_two_extra_runs, SUM(runs_scored+extra_runs) AS innings_two_runs
+			FROM ball_by_ball
+			WHERE match_id = $1 and innings_no=2) AS t2) AS t3
+	CROSS JOIN
+		(SELECT *
+		FROM
+			(SELECT COUNT(*) AS first_innings_wicket
+			FROM ball_by_ball
+			WHERE match_id = $1 and innings_no=1 and out_type!='NULL') AS t1
+		CROSS JOIN
+			(SELECT SUM(extra_runs) AS innings_one_extra_runs, SUM(runs_scored+extra_runs) AS innings_one_runs
+			FROM ball_by_ball
+			WHERE match_id = $1 and innings_no=1) AS t2) AS t4) AS t9;
+
+
+
+
+---------------------- BOWLER QUERY -------------------------
+
+SELECT player.player_id, player.player_name, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+FROM player
+INNER JOIN
+	(SELECT t1.bowler, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+	FROM
+		(SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored) AS runs_given
+		FROM ball_by_ball
+		WHERE match_id = $1 AND innings_no=1
+		GROUP BY bowler) AS t1
+	LEFT JOIN
+		(SELECT bowler, COUNT(*) AS wickets
+		FROM ball_by_ball
+		WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+		GROUP BY bowler) AS t2
+	ON t1.bowler = t2.bowler) AS t4
+ON player.player_id=t4.bowler;
+
+
+
+---------------------------- Match INFO part 1,2,3  ------------------------
+
+SELECT match_id, season_year, teamOne, teamTwo, venue_name, city_name, country_name, concat(toss_winner_team, ' won the toss and opt to ', toss_name, ' first')as toss
+FROM
+	(SELECT match_id, season_year, toss_name, teamOne, teamTwo, toss_winner_team, venue_name, city_name, country_name
+	FROM
+		(SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, teamTwo, team_name as toss_winner_team
+		FROM
+			(SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, team_name as teamTwo
+			FROM
+				(SELECT match_id, season_year, team1, team2, venue_id, toss_name, toss_winner, team.team_name as teamOne
+				FROM match, team
+				WHERE match_id = $1 AND team1=team.team_id) AS t1
+			INNER JOIN team
+			ON team.team_id = team2) AS t2
+		INNER JOIN team
+		ON toss_winner=team_id) AS t3
+	INNER JOIN venue
+	ON t3.venue_id = venue.venue_id) AS t4;
+
+
+---------- umpire--------------
+
+SELECT umpire.umpire_id, umpire_name, role_desc
+FROM
+	(SELECT umpire_id, role_desc FROM umpire_match WHERE match_id = $1) AS t1
+INNER JOIN umpire
+ON t1.umpire_id = umpire.umpire_id;
+
+
+-------- team players--------
+
+SELECT player.player_id, player_name, role_desc
+FROM
+	(SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team1 FROM match WHERE match_id=$1)) AS t1
+INNER JOIN player
+ON player.player_id=t1.player_id;
+
+
+
+----------------- Pie Chart Runs Cumulative Sum ------------
+SELECT over_id, runs, SUM(runs) over (order by over_id) as total_score
+FROM
+	(select over_id, SUM(runs_scored+extra_runs) as runs
+	from ball_by_ball
+	where match_id = $1 and innings_no = 1
+	group by over_id
+	order by over_id) AS t1;
+
+
+
+--------------- DOT radius---------------
+
+SELECT t1.over_id, COALESCE(down*2, 0) AS dotRadius
+FROM
+	(SELECT DISTINCT over_id
+	FROM ball_by_ball
+	WHERE match_id = $1 AND innings_no=1) AS t1
+LEFT JOIN
+	(SELECT over_id, COUNT(*) AS down
+	FROM ball_by_ball
+	WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+	GROUP BY over_id) AS t3
+ON t1.over_id = t3.over_id
+ORDER BY t1.over_id;

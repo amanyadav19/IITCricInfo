@@ -7,9 +7,11 @@ import { Line, } from "react-chartjs-2";
 
 export const ScoreComparison = (props) => {
     const parameters = useParams();
-    const { scoreComparison, scoreComparisonTwo } = useContext(ScoreComparisonContext);
+    const { scoreComparison, scoreComparisonTwo, InningOneWickets, InningTwoWickets } = useContext(ScoreComparisonContext);
     const [ firstInningRuns, setFirstInningRuns] = scoreComparison
     const [ secondInningRuns, setSecondInningRuns] = scoreComparisonTwo
+    const [ inningOneWickets, setInningOneWickets ] = InningOneWickets
+    const [ inningTwoWickets, setInningTwoWickets ] = InningTwoWickets
 
     useEffect( () => {
         const fetchData = async() => {
@@ -17,6 +19,8 @@ export const ScoreComparison = (props) => {
                 const response = await Path.get(`/matches/score_comparison/${parameters.id}`);
                 setFirstInningRuns(response.data.data.inningOne);
                 setSecondInningRuns(response.data.data.inningTwo);
+                setInningOneWickets(response.data.data.inningOneWickets);
+                setInningTwoWickets(response.data.data.inningTwoWickets);
             } 
             finally {
             }
@@ -32,31 +36,37 @@ export const ScoreComparison = (props) => {
             {
                 label: 'Runs',
                 backgroundColor: 'rgba(75,192,192,1)',
-                borderColor: 'rgba(0,0,0,1)',
+                borderColor: 'rgb(75, 192, 192)',
                 borderWidth: 2,
-                data: firstInningRuns.map(el => el.runs)
+                data: firstInningRuns.map(el => el.total_score),
+                pointRadius: inningOneWickets.map(el => el.dotradius),
             },
             {
                 label: 'Runs',
                 backgroundColor: 'rgba(75,192,192,1)',
-                borderColor: 'rgba(0,0,0,1)',
+                borderColor: 'rgb(255,0,0)',
                 borderWidth: 2,
-                data: secondInningRuns.map(el => el.runs)
+                data: secondInningRuns.map(el => el.total_score),
+                pointRadius: inningTwoWickets.map(el => el.dotradius),
             }
             ]
         }}
-        options={{
+        options={
+            {
             plugins:{
             title:{
             display:true,
             text:'Runs Scored in each match',
             fontSize:20
             },
+            
             legend:{
             display:true,
             position:'right'
-            }}
-        }}
+            }
+        }    
+        }
+        }
         />
 
   </div>
