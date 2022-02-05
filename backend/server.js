@@ -14,7 +14,7 @@ app.use(express.json());
 app.get("/matches", async (req, res) => {
     try{
         const results = await db.query(`
-            SELECT team1_name AS Team1, team2_name AS Team2, venue_name AS stadium_name, city_name, result, season_year
+            SELECT match_id, team1_name AS Team1, team2_name AS Team2, venue_name AS stadium_name, city_name, result, season_year
             FROM
                 (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, match_winner_name, concat(match_winner_name, ' won by ', ' ', win_margin, ' ', win_type) as result
                 FROM

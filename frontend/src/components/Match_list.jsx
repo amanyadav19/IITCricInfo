@@ -19,7 +19,7 @@ export const Match_list = (props) => {
     }, []);
 
     const handleMatchSelect = (id) => {
-        history.push(`/match/${id}`); //////////// see this
+        history.push(`/matches/${id}`); //////////// see this
     }
   return (<div className="list-group">
         <table className="table table-hover table-dark">
@@ -34,8 +34,7 @@ export const Match_list = (props) => {
             </thead>
             <tbody>
                 {matches && matches.map(el => {return(
-                     <tr key = {el.match_id}>  {/*onClick={() => handleVenueSelect(el.venue_id)}   onClick={() =>getMatcheData(info.match_id)}*/}
-                    {/* <td><a href='#' >{el.match_id}</a></td> */}
+                     <tr onClick={() => handleMatchSelect(el.match_id)} key = {el.match_id}>
                     <td>{el.team1}</td>
                     <td>{el.team2}</td>
                     <td>{el.stadium_name}</td>
