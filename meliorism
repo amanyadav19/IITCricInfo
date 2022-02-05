@@ -1,3 +1,15 @@
+1. Total number of entries have to be fetched first itself to set an upper bound no the number of pages that could appear on the website.
+2. Upper and lower limit on the number of pages
+3. complete the prev page button
+4. can i pass page_no as a use state variable
+5. matches in pages on the table
+6. display all the required match info in part a summary etc.
+7. check the match_id thing in the url.. which to and where to.
+8. Put extras and Total
+9. Add hyperlinks to player names to their basic info
+10. See the differences between async and promise types and use the one appropriate.
+11. First innings ( name of team batting first) : above the scoreboard
+
 1. Should display all the batters in the inning even if did not bat?
 2. Add states and other stuff for the match info.
 3. Moving score comparison below the matches/id makes the server non responsive towards score comparison
@@ -5,3 +17,7 @@
 5. Is the pie chart for a single team or for the whole match// match summary.
 6. Add extra runs to the pie chart.
 7. How to exactly define draw
+
+///////////////////
+
+1. Make all the tables striped.
