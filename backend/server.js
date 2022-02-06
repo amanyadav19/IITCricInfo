@@ -32,8 +32,59 @@ app.get("/matches", async (req, res) => {
                     ON t2.match_winner = team.team_id) AS t3) AS t4
             INNER JOIN venue
             ON t4.venue_id = venue.venue_id
-            ORDER BY season_year DESC;
+            ORDER BY season_year DESC, match_id
+            LIMIT 10;
         `);
+
+        const resultsCount = await db.query(`
+        SELECT COUNT(*) FROM match;
+        `);
+        
+
+        res.status(200).json({
+          status: "sucess",
+          results: results.rows.length,
+          data: {
+            matches: results.rows,
+            totalResults: resultsCount.rows[0]["count"],
+          },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+
+// get all matches
+app.get("/matches/page/:page_no", async (req, res) => {
+    try{
+        const results = await db.query(
+          `
+            SELECT match_id, team1_name AS Team1, team2_name AS Team2, venue_name AS stadium_name, city_name, result, season_year
+            FROM
+                (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, match_winner_name, concat(match_winner_name, ' won by ', ' ', win_margin, ' ', win_type) as result
+                FROM
+                    (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, team.team_name as match_winner_name
+                    FROM
+                        (SELECT match_id, season_year, venue_id, match_winner, win_type, win_margin, team1_name, team.team_name as team2_name
+                        FROM
+                            (SELECT match_id, season_year, team1, team2, venue_id, match_winner, win_type, win_margin, team_name as team1_name
+                            FROM match
+                            INNER JOIN team
+                            ON team1=team.team_id) AS t1
+                        INNER JOIN team
+                        ON team2=team.team_id) AS t2
+                    INNER JOIN team
+                    ON t2.match_winner = team.team_id) AS t3) AS t4
+            INNER JOIN venue
+            ON t4.venue_id = venue.venue_id
+            ORDER BY season_year DESC, match_id
+            OFFSET 10*$1
+            LIMIT 10;
+        `,
+          [req.params.page_no]
+        );
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,
@@ -47,6 +98,7 @@ app.get("/matches", async (req, res) => {
     }
     
 });
+
 
 // get Score Comaprison Graph Stats for a match
 app.get("/matches/score_comparison/:id", async (req, res) => {
