@@ -9,35 +9,28 @@ import { useHistory } from "react-router-dom";
 export const Match_Summary_Stats = (props) => {
     const parameters = useParams();
     const history = useHistory();
-    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler, Won, MatchInfo, AllOne } = useContext(MatchSummaryContext);
+    const { MatchSummary, MatchSummaryTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler, Won, MatchInfo} = useContext(MatchSummaryContext);
     const [ matchSummary, setMatchSummary] = MatchSummary
-    const [ extraRuns, setExtraRuns] = ExtraRuns
     const [ matchSummaryTwo, setMatchSummaryTwo] = MatchSummaryTwo
-    const [ extraRunsTwo, setExtraRunsTwo] = ExtraRunsTwo
     const [inningOneBatter, setInningOneBatter] = InningOneBatter;
     const [inningTwoBatter, setInningTwoBatter] = InningTwoBatter;
     const [inningOneBowler, setInningOneBowler] = InningOneBowler;
     const [inningTwoBowler, setInningTwoBowler] = InningTwoBowler;
     const [ won, setWon ] = Won
     const [ matchInfo, setMatchInfo ] = MatchInfo;
-    const [ allOne, setAllOne ] = AllOne
-    
+
     useEffect( () => {
         const fetchData = async() => {
             try{
                 const response = await Path.get(`/matches/match_summary/${parameters.id}`);
                 setMatchSummary(response.data.data.summaryOne);
-                setExtraRuns(response.data.data.extraRunsOne)
                 setMatchSummaryTwo(response.data.data.summaryTwo);
-                setExtraRunsTwo(response.data.data.extraRunsTwo);
                 setInningOneBatter(response.data.data.inningOneBatter);
                 setInningTwoBatter(response.data.data.inningTwoBatter);
                 setInningOneBowler(response.data.data.inningOneBowler);
                 setInningTwoBowler(response.data.data.inningTwoBowler);
                 setWon(response.data.data.won);
                 setMatchInfo(response.data.data.matchInfo);
-                setAllOne(matchSummary.map(el => el.runtype));
-                // matchSummary.push("extras");
             } 
             finally {
             }
@@ -99,7 +92,7 @@ export const Match_Summary_Stats = (props) => {
   <div class="w-50 container fluid" >
      <Pie
           data={{
-            labels: {allOne},
+            labels: matchSummary.map(el => el.runtype),
             datasets: [
               {
                 label: 'Match Outline',

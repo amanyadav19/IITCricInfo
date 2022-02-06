@@ -203,41 +203,33 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
 app.get("/matches/match_summary/:id", async (req, res) => {
     try{
         const summaryOne = await db.query(
-          `
-            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
-            FROM ball_by_ball
-            WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
-            GROUP BY runs_scored
-            ORDER BY runType;
+        `
+        SELECT *
+        FROM
+        (SELECT cast(runs_scored as text) AS runType, COUNT(*)*runs_scored AS runScored
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
+        GROUP BY runs_scored
+        ORDER BY runType) AS t1
+        UNION
+        (SELECT 'Extra Runs' as runType, (SELECT SUM(extra_runs) as runs FROM ball_by_ball Where match_id = $1 AND innings_no=1) as runScored)
+        ORDER BY runType;
         `,
           [req.params.id]
         );
 
         const summaryTwo = await db.query(
           `
-            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
-            FROM ball_by_ball
-            WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
-            GROUP BY runs_scored
-            ORDER BY runType;
-        `,
-          [req.params.id]
-        );
-
-        const extraRunsOne = await db.query(
-          `
-            SELECT SUM(extra_runs) as runs
-            FROM ball_by_ball
-            Where match_id = $1 AND innings_no=1;
-        `,
-          [req.params.id]
-        );
-
-        const extraRunsTwo = await db.query(
-          `
-            SELECT SUM(extra_runs) as runs
-            FROM ball_by_ball
-            Where match_id = $1 AND innings_no=2;
+        SELECT *
+        FROM
+        (SELECT cast(runs_scored as text) AS runType, COUNT(*)*runs_scored AS runScored
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
+        GROUP BY runs_scored
+        ORDER BY runType) AS t1
+        UNION
+        (SELECT 'Extra Runs' as runType, (SELECT SUM(extra_runs) as runs FROM ball_by_ball Where match_id = $1 AND innings_no=2) as runScored)
+        ORDER BY runType;
         `,
           [req.params.id]
         );
@@ -403,8 +395,6 @@ app.get("/matches/match_summary/:id", async (req, res) => {
           data: {
             summaryOne: summaryOne.rows,
             summaryTwo: summaryTwo.rows,
-            extraRunsOne: extraRunsOne.rows,
-            extraRunsTwo: extraRunsTwo.rows,
             inningOneBatter: inningOneBatter.rows,
             inningTwoBatter: inningTwoBatter.rows,
             inningOneBowler: inningOneBowler.rows,
