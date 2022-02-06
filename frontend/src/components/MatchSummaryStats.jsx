@@ -39,20 +39,20 @@ export const Match_Summary_Stats = (props) => {
     }, []);
 
   const handlePlayerSelect = (id) => {
-    history.push(`/players/${id}`); //////////// see this
+    history.push(`/players/${id}`);
   }
 
 
   return (
   <>
-  <center><h1>Match Summary</h1></center>
+  <center><h1 style={{margin:20}}>Match Summary</h1></center>
 
-  <div class="container">
+  <div class="container-fluid" style={{paddingLeft:50, paddingRight:50}}>
   <div class="row">
   <div class="col">
-  <center><h5>{matchInfo.map(el => el.first_batting)}</h5> </center>
+  <center><h5 style={{margin:10}}><b>{matchInfo.map(el => el.first_batting)}</b></h5> </center>
 
-  <div class="container-fluid table-responsive py-5">
+  <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -75,7 +75,7 @@ export const Match_Summary_Stats = (props) => {
   </div>
 
 
-    <div class="container-fluid table-responsive py-5">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -97,13 +97,13 @@ export const Match_Summary_Stats = (props) => {
   </table>
   </div>
   
-  <div class="w-50 container-fluid table-responsive py-5" >
+  <div class="w-75 container-fluid" >
      <Pie
           data={{
             labels: matchSummary.map(el => el.runtype),
             datasets: [
               {
-                label: 'Match Outline',
+                label: 'Runs Percentage',
                 backgroundColor: [
                   'rgb(255, 205, 86)',
                   '#B21F00',
@@ -111,6 +111,7 @@ export const Match_Summary_Stats = (props) => {
                   '#2FDE00',
                   'rgb(255, 99, 132)',
                   'rgb(54, 162, 235)',
+                  'rgb(56, 0, 120)',
                 ],
                 hoverBackgroundColor: [
                 '#501800',
@@ -124,7 +125,7 @@ export const Match_Summary_Stats = (props) => {
           options={{plugins:{
             title:{
               display:true,
-              text:'Match Outline',
+              text:'Runs Percentage',
               fontSize:30
             },
             legend:{
@@ -138,9 +139,9 @@ export const Match_Summary_Stats = (props) => {
   </div> {/* col */}
 
   <div class="col">
-  <center><h5>{matchInfo.map(el => el.first_bowling)}</h5> </center>
+  <center><h5 style={{margin:10}}><b>{matchInfo.map(el => el.first_bowling)}</b></h5> </center>
 
-    <div class="container-fluid table-responsive py-5">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -162,7 +163,7 @@ export const Match_Summary_Stats = (props) => {
   </table>
   </div>
 
-    <div class="container-fluid table-responsive py-5">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -184,13 +185,13 @@ export const Match_Summary_Stats = (props) => {
   </table>
   </div>
 
-  <div class="w-50 container-fluid table-responsive py-5" >
+  <div class="w-75 container-fluid" >
     <Pie
           data={{
             labels: matchSummaryTwo.map(el => el.runtype),
             datasets: [
               {
-                label: 'Match Outline',
+                label: 'Runs Percentage',
                 backgroundColor: [
                   'rgb(255, 205, 86)',
                   '#B21F00',
@@ -211,7 +212,7 @@ export const Match_Summary_Stats = (props) => {
           options={{plugins:{
             title:{
               display:true,
-              text:'Match Outline',
+              text:'Runs Percentage',
               fontSize:30
             },
             legend:{

@@ -37,9 +37,11 @@ export const ScoreComparison = (props) => {
 
     <center><h1>Score Comparison</h1></center>
 
-  <div class="container-fluid py-5">
+  <div class="container chart-container py-5">
 
         <Line
+        // height="50px"
+        // width="50px"
         data={{
             labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
             datasets: [
@@ -71,9 +73,10 @@ export const ScoreComparison = (props) => {
                 
                 legend:{
                 display:true,
-                position:'right'
-                }
-            },            
+                position:'top'
+                },
+            },
+            maintainAspectRatio: true
         }}
         />
     </div>

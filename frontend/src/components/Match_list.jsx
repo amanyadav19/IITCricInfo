@@ -50,12 +50,12 @@ export const Match_list = (props) => {
 
   return (
   <>
-  <center><b><h1 style={{fontFamily: 'sans-serif'}}>
+  <center><b><h1 style={{fontFamily: 'sans-serif', margin:30, fontSize:60}}>
       Match List
   </h1></b>
   </center>
 
-  <div class="container-fluid table-responsive py-5">
+  <div class="container-fluid table-responsive py-3" style={{paddingLeft:200, paddingRight:200}}>
         <table className="table table-hover table-bordered table-striped" id="match_list">
             <thead class="thead-dark">
                 <tr>

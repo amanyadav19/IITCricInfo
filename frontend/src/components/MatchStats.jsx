@@ -26,9 +26,8 @@ export const MatchStats = (props) => {
             height: height
         }}
     />
-);
+    );
 
-    
     useEffect( () => {
         const fetchData = async() => {
             try{
@@ -56,7 +55,7 @@ export const MatchStats = (props) => {
   return (<div>
     <ColoredLine color="grey" height={0.5}/>
 
-    <div class="container">
+    <div class="container-fluid" style={{paddingLeft:50, paddingRight:50}}>
 
     <center><h1 style={{margin:20}}><b>Inning 1</b></h1></center>
 
@@ -64,7 +63,7 @@ export const MatchStats = (props) => {
 
     <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h6>Batting: {el.first_batting}</h6>
+    <h5 style={{margin:10}}><b>Batting: {el.first_batting}</b></h5>
     )})}</center>
 
   <div class="container-fluid table-responsive py-3">
@@ -96,7 +95,7 @@ export const MatchStats = (props) => {
     
     <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h6 style={{margin:10}}>Bowling: {el.first_bowling}</h6>
+    <h5 style={{margin:10}}><b>Bowling: {el.first_bowling}</b></h5>
     )})}</center>
 
     <div class="container-fluid table-responsive py-3">
@@ -142,7 +141,7 @@ export const MatchStats = (props) => {
     <div class="row">
     <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h6>Batting: {el.first_bowling}</h6>
+    <h5><b>Batting: {el.first_bowling}</b></h5>
     )})}</center>
 
 
@@ -175,7 +174,7 @@ export const MatchStats = (props) => {
     
     <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h6 style={{margin:10}}>Bowling: {el.first_batting}</h6>
+    <h5 style={{margin:10}}><b>Bowling: {el.first_batting}</b></h5>
     )})}</center>
 
     <div class="container-fluid table-responsive py-3">
@@ -221,7 +220,7 @@ export const MatchStats = (props) => {
 
     <center><h1 style={{margin:40}}>Match Information</h1></center>
 
-    <div class="container-fluid table-responsive">
+    <div class="container-fluid table-responsive" style={{paddingLeft:250, paddingRight:250}}>
     <table className="table table-hover table-bordered table-striped">
     <thead className="thead-dark">
         <tr className="bg-primary">
