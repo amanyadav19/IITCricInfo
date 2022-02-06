@@ -45,16 +45,14 @@ export const Match_Summary_Stats = (props) => {
 
   return (
   <>
-    <center><h1>Match Summary</h1></center>
+  <center><h1>Match Summary</h1></center>
+
   <div class="container">
   <div class="row">
-    <div class="col">
-    <div class="container-fluid py-5">
-
-    <center><h5>{matchInfo.map(el => el.first_batting)}</h5> </center>
+  <div class="col">
+  <center><h5>{matchInfo.map(el => el.first_batting)}</h5> </center>
 
   <div class="container-fluid table-responsive py-5">
-    <div class="table-resposive">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -77,7 +75,7 @@ export const Match_Summary_Stats = (props) => {
   </div>
 
 
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-5">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -137,14 +135,12 @@ export const Match_Summary_Stats = (props) => {
           }}}
         />
   </div>
-  </div>
+  </div> {/* col */}
 
-</div>
-<div class="col">
-
+  <div class="col">
   <center><h5>{matchInfo.map(el => el.first_bowling)}</h5> </center>
 
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-5">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -166,8 +162,7 @@ export const Match_Summary_Stats = (props) => {
   </table>
   </div>
 
-
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-5">
     <table className="table table-hover table-bordered table-striped">
         <thead class="thead-dark">
         <tr className="bg-primary">
@@ -190,7 +185,6 @@ export const Match_Summary_Stats = (props) => {
   </div>
 
   <div class="w-50 container-fluid table-responsive py-5" >
-
     <Pie
           data={{
             labels: matchSummaryTwo.map(el => el.runtype),
@@ -227,16 +221,12 @@ export const Match_Summary_Stats = (props) => {
             }
           }}}
         />
-</div>
+    </div>
+    </div>  {/* col */}
+    </div>    {/* row */}
+    </div>     {/* container */}
+    <center><h5><b>{won.map(el => el.won)}</b></h5></center>
 
-    <center><h4>{won.map(el => el.won)}</h4></center>
-
-    
-</div>
-    
-</div>
-</div>
-</div>
 </>
 );
 };

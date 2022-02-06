@@ -35,7 +35,7 @@ export const ScoreComparison = (props) => {
     <>
   <div class="container-fluid py-5">
 
-    <center><h2>Score Comparison</h2></center>
+    <center><h1>Score Comparison</h1></center>
 
   <div class="container-fluid py-5">
 
@@ -77,7 +77,7 @@ export const ScoreComparison = (props) => {
         }}
         />
     </div>
-    <center><h4>{won.map(el => el.won)}</h4></center>
+    <center><h5><b>{won.map(el => el.won)}</b></h5></center>
     </div>
   </>
   );
