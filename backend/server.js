@@ -13,7 +13,27 @@ app.use(express.json());
 // get all matches
 app.get("/matches", async (req, res) => {
     try{
-        const results = await db.query("SELECT * FROM match");
+        const results = await db.query(`
+            SELECT match_id, team1_name AS Team1, team2_name AS Team2, venue_name AS stadium_name, city_name, result, season_year
+            FROM
+                (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, match_winner_name, concat(match_winner_name, ' won by ', ' ', win_margin, ' ', win_type) as result
+                FROM
+                    (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, team.team_name as match_winner_name
+                    FROM
+                        (SELECT match_id, season_year, venue_id, match_winner, win_type, win_margin, team1_name, team.team_name as team2_name
+                        FROM
+                            (SELECT match_id, season_year, team1, team2, venue_id, match_winner, win_type, win_margin, team_name as team1_name
+                            FROM match
+                            INNER JOIN team
+                            ON team1=team.team_id) AS t1
+                        INNER JOIN team
+                        ON team2=team.team_id) AS t2
+                    INNER JOIN team
+                    ON t2.match_winner = team.team_id) AS t3) AS t4
+            INNER JOIN venue
+            ON t4.venue_id = venue.venue_id
+            ORDER BY season_year DESC;
+        `);
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,
@@ -32,25 +52,133 @@ app.get("/matches", async (req, res) => {
 app.get("/matches/score_comparison/:id", async (req, res) => {
   try {
     const inningOne = await db.query(
-      `
-        select over_id, SUM(runs_scored+extra_runs) as runs
+    `
+    SELECT over_id, runs, SUM(runs) over (order by over_id) as total_score
+    FROM
+        (select over_id, SUM(runs_scored+extra_runs) as runs
         from ball_by_ball
         where match_id = $1 and innings_no = 1
         group by over_id
-        order by over_id;    
+        order by over_id) AS t1;
     `,
       [req.params.id]
     );
 
     const inningTwo = await db.query(
-      `
-        select over_id, SUM(runs_scored+extra_runs) as runs
+    `
+    SELECT over_id, runs, SUM(runs) over (order by over_id) as total_score
+    FROM
+        (select over_id, SUM(runs_scored+extra_runs) as runs
         from ball_by_ball
         where match_id = $1 and innings_no = 2
         group by over_id
-        order by over_id;    
+        order by over_id) AS t1;
     `,
       [req.params.id]
+    );
+
+    const inningOneWickets = await db.query(
+    `
+    SELECT t1.over_id, COALESCE(down*3, 0) AS dotRadius
+    FROM
+        (SELECT DISTINCT over_id
+        FROM ball_by_ball
+        WHERE match_id = $1 AND innings_no=1) AS t1
+    LEFT JOIN
+        (SELECT over_id, COUNT(*) AS down
+        FROM ball_by_ball
+        WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+        GROUP BY over_id) AS t3
+    ON t1.over_id = t3.over_id
+    ORDER BY t1.over_id;
+    `,
+      [req.params.id]
+    );
+
+    const inningTwoWickets = await db.query(
+      `
+    SELECT t1.over_id, COALESCE(down*3, 0) AS dotRadius
+    FROM
+        (SELECT DISTINCT over_id
+        FROM ball_by_ball
+        WHERE match_id = $1 AND innings_no=2) AS t1
+    LEFT JOIN
+        (SELECT over_id, COUNT(*) AS down
+        FROM ball_by_ball
+        WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+        GROUP BY over_id) AS t3
+    ON t1.over_id = t3.over_id
+    ORDER BY t1.over_id;
+    `,
+      [req.params.id]
+    );
+
+    const first_batting_bowling = await db.query(
+        `
+        SELECT *
+        FROM
+            (SELECT first_batting, team_name as first_bowling
+            FROM team
+            INNER JOIN
+                (SELECT firstbatting, firstbowling, team_name as first_batting
+                FROM team
+                INNER JOIN
+                    (SELECT Firstbatting,
+                        CASE 
+                            WHEN Firstbatting=team1 THEN team2
+                            ELSE team1
+                        END
+                        AS Firstbowling
+                    FROM
+                        (SELECT team1, team2, toss_winner, toss_name,
+                            CASE
+                                WHEN ((team1=toss_winner AND toss_name='bat') OR (team2=toss_winner AND toss_name='field')) THEN team1
+                                ELSE team2
+                            END
+                            AS Firstbatting
+                        FROM match
+                        WHERE match_id = $1) AS t1) AS t2
+                ON team.team_id = t2.firstbatting) AS t3
+            ON team.team_id = t3.firstbowling) AS t8
+        CROSS JOIN
+            (SELECT *
+            FROM
+                (SELECT *
+                FROM
+                    (SELECT COUNT(*) AS second_innings_wicket
+                    FROM ball_by_ball
+                    WHERE match_id = $1 and innings_no=2 and out_type!='NULL') AS t1
+                CROSS JOIN
+                    (SELECT SUM(extra_runs) AS innings_two_extra_runs, SUM(runs_scored+extra_runs) AS innings_two_runs
+                    FROM ball_by_ball
+                    WHERE match_id = $1 and innings_no=2) AS t2) AS t3
+            CROSS JOIN
+                (SELECT *
+                FROM
+                    (SELECT COUNT(*) AS first_innings_wicket
+                    FROM ball_by_ball
+                    WHERE match_id = $1 and innings_no=1 and out_type!='NULL') AS t1
+                CROSS JOIN
+                    (SELECT SUM(extra_runs) AS innings_one_extra_runs, SUM(runs_scored+extra_runs) AS innings_one_runs
+                    FROM ball_by_ball
+                    WHERE match_id = $1 and innings_no=1) AS t2) AS t4) AS t9;
+    `,
+        [req.params.id]
+    );
+
+    const won = await db.query(
+    `
+    SELECT concat(team_name, ' won by ', win_margin, ' ', win_type) AS won
+    FROM
+    (SELECT team_name, win_type, win_margin
+    FROM
+        (SELECT match_winner, win_type, win_margin
+        FROM match
+        WHERE match_id = $1) AS t1
+    INNER JOIN team
+    ON t1.match_winner=team.team_id) AS t2;
+    `,
+        [req.params.id]
     );
 
     console.log(inningOne.rows);
@@ -60,6 +188,10 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
       data: {
         inningOne: inningOne.rows,
         inningTwo: inningTwo.rows,
+        inningOneWickets: inningOneWickets.rows,
+        inningTwoWickets: inningTwoWickets.rows,
+        firstBattingBowling: first_batting_bowling.rows,
+        won: won.rows,
       },
     });
   } catch (err) {
@@ -71,44 +203,191 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
 app.get("/matches/match_summary/:id", async (req, res) => {
     try{
         const summaryOne = await db.query(
-          `
-            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
-            FROM ball_by_ball
-            WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
-            GROUP BY runs_scored
-            ORDER BY runType;
+        `
+        SELECT *
+        FROM
+        (SELECT cast(runs_scored as text) AS runType, COUNT(*)*runs_scored AS runScored
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=1 AND runs_scored!=0
+        GROUP BY runs_scored
+        ORDER BY runType) AS t1
+        UNION
+        (SELECT 'Extra Runs' as runType, (SELECT SUM(extra_runs) as runs FROM ball_by_ball Where match_id = $1 AND innings_no=1) as runScored)
+        ORDER BY runType;
         `,
           [req.params.id]
         );
 
         const summaryTwo = await db.query(
           `
-            SELECT runs_scored AS runType, COUNT(*)*runs_scored AS runScored
-            FROM ball_by_ball
-            WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
-            GROUP BY runs_scored
-            ORDER BY runType;
+        SELECT *
+        FROM
+        (SELECT cast(runs_scored as text) AS runType, COUNT(*)*runs_scored AS runScored
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=2 AND runs_scored!=0
+        GROUP BY runs_scored
+        ORDER BY runType) AS t1
+        UNION
+        (SELECT 'Extra Runs' as runType, (SELECT SUM(extra_runs) as runs FROM ball_by_ball Where match_id = $1 AND innings_no=2) as runScored)
+        ORDER BY runType;
         `,
           [req.params.id]
         );
 
-        const extraRunsOne = await db.query(
-          `
-            SELECT SUM(extra_runs) as runs
+        const inningOneBatter = await db.query(
+        `
+        SELECT player_name, player_id, total_runs_scored, balls_faced
+        FROM player
+        INNER JOIN
+            (SELECT striker, SUM(runs_scored) AS total_runs_scored, COUNT(*) AS balls_faced
             FROM ball_by_ball
-            Where match_id = $1 AND innings_no=1;
+            WHERE match_id = $1 AND innings_no = 1
+            GROUP BY striker) AS t0
+        ON player.player_id = t0.striker
+        ORDER BY total_runs_scored DESC, balls_faced ASC, player_name ASC
+        LIMIT 3;
         `,
           [req.params.id]
         );
 
-        const extraRunsTwo = await db.query(
-          `
-            SELECT SUM(extra_runs) as runs
+        const inningTwoBatter = await db.query(
+        `
+        SELECT player_name, player_id, total_runs_scored, balls_faced
+        FROM player
+        INNER JOIN
+            (SELECT striker, SUM(runs_scored) AS total_runs_scored, COUNT(*) AS balls_faced
             FROM ball_by_ball
-            Where match_id = $1 AND innings_no=2;
+            WHERE match_id = $1 AND innings_no=2
+            GROUP BY striker) AS t0
+        ON player.player_id = t0.striker
+        ORDER BY total_runs_scored DESC, balls_faced ASC, player_name ASC
+        LIMIT 3;
         `,
           [req.params.id]
         );
+
+        const inningOneBowler = await db.query(
+        `
+        SELECT player_name, player_id, wickets_taken, runs_given
+        FROM
+            player
+        INNER JOIN
+            (SELECT t0.bowler, wickets_taken, runs_given
+            FROM
+                (SELECT bowler, COUNT(*) AS wickets_taken
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                GROUP BY bowler) AS t0
+            LEFT JOIN 
+                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                FROM ball_by_ball
+                WHERE match_id=$1 AND innings_no=1
+                GROUP BY bowler) AS t1
+            ON t0.bowler = t1.bowler) AS t2
+        ON player.player_id = t2.bowler
+        ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
+        const inningTwoBowler = await db.query(
+        `
+        SELECT player_name, player_id, wickets_taken, runs_given
+        FROM
+            player
+        INNER JOIN
+            (SELECT t0.bowler, wickets_taken, runs_given
+            FROM
+                (SELECT bowler, COUNT(*) AS wickets_taken
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                GROUP BY bowler) AS t0
+            LEFT JOIN 
+                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                FROM ball_by_ball
+                WHERE match_id=$1 AND innings_no=2
+                GROUP BY bowler) AS t1
+            ON t0.bowler = t1.bowler) AS t2
+        ON player.player_id = t2.bowler
+        ORDER BY wickets_taken DESC, runs_given ASC, player_name ASC
+        LIMIT 3;
+        `,
+          [req.params.id]
+        );
+
+
+
+        const won = await db.query(
+        `
+        SELECT concat(team_name, ' won by ', win_margin, ' ', win_type) AS won
+        FROM
+        (SELECT team_name, win_type, win_margin
+        FROM
+            (SELECT match_winner, win_type, win_margin
+            FROM match
+            WHERE match_id = $1) AS t1
+        INNER JOIN team
+        ON t1.match_winner=team.team_id) AS t2;
+        `,
+          [req.params.id]
+        );
+
+
+        const matchInfo = await db.query(
+          `
+            SELECT *
+            FROM
+                (SELECT first_batting, team_name as first_bowling
+                FROM team
+                INNER JOIN
+                    (SELECT firstbatting, firstbowling, team_name as first_batting
+                    FROM team
+                    INNER JOIN
+                        (SELECT Firstbatting,
+                            CASE 
+                                WHEN Firstbatting=team1 THEN team2
+                                ELSE team1
+                            END
+                            AS Firstbowling
+                        FROM
+                            (SELECT team1, team2, toss_winner, toss_name,
+                                CASE
+                                    WHEN ((team1=toss_winner AND toss_name='bat') OR (team2=toss_winner AND toss_name='field')) THEN team1
+                                    ELSE team2
+                                END
+                                AS Firstbatting
+                            FROM match
+                            WHERE match_id = $1) AS t1) AS t2
+                    ON team.team_id = t2.firstbatting) AS t3
+                ON team.team_id = t3.firstbowling) AS t8
+            CROSS JOIN
+                (SELECT *
+                FROM
+                    (SELECT *
+                    FROM
+                        (SELECT COUNT(*) AS second_innings_wicket
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=2 and out_type!='NULL') AS t1
+                    CROSS JOIN
+                        (SELECT SUM(extra_runs) AS innings_two_extra_runs, SUM(runs_scored+extra_runs) AS innings_two_runs
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=2) AS t2) AS t3
+                CROSS JOIN
+                    (SELECT *
+                    FROM
+                        (SELECT COUNT(*) AS first_innings_wicket
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=1 and out_type!='NULL') AS t1
+                    CROSS JOIN
+                        (SELECT SUM(extra_runs) AS innings_one_extra_runs, SUM(runs_scored+extra_runs) AS innings_one_runs
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=1) AS t2) AS t4) AS t9;
+        `,
+          [req.params.id]
+        );
+
+
 
         res.status(200).json({
           status: "sucess",
@@ -116,8 +395,12 @@ app.get("/matches/match_summary/:id", async (req, res) => {
           data: {
             summaryOne: summaryOne.rows,
             summaryTwo: summaryTwo.rows,
-            extraRunsOne: extraRunsOne.rows,
-            extraRunsTwo: extraRunsTwo.rows,
+            inningOneBatter: inningOneBatter.rows,
+            inningTwoBatter: inningTwoBatter.rows,
+            inningOneBowler: inningOneBowler.rows,
+            inningTwoBowler: inningTwoBowler.rows,
+            won: won.rows,
+            matchInfo: matchInfo.rows,
           },
         });
     }
@@ -132,55 +415,240 @@ app.get("/matches/match_summary/:id", async (req, res) => {
 app.get("/matches/:id", async (req, res) => {
     try{
         const i1_batter = await db.query(
-          `SELECT player_id, player_name, runs, balls_faced, strike_rate
-            FROM player
-            INNER JOIN
-            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+          `
+            SELECT player_id, player_name, runs, balls_faced, strike_rate, fours, COALESCE(sixes, 0) as sixes
             FROM
-            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
-            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
-            GROUP BY striker) AS t2) AS t3
-            ON player.player_id = t3.batter;`,
-            [req.params.id]
+                (SELECT t4.player_id, t4.player_name, t4.runs, t4.balls_faced, strike_rate, COALESCE(fours, 0) AS fours
+                FROM
+                    (SELECT player_id, player_name, runs, balls_faced, strike_rate
+                    FROM player
+                    INNER JOIN
+                        (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+                        FROM
+                            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+                            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=1) AS t1
+                            GROUP BY striker) AS t2) AS t3
+                    ON player.player_id = t3.batter) AS t4
+                LEFT JOIN
+                    (SELECT striker as batter, count(*) as fours
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=1 AND runs_scored = 4
+                    GROUP BY striker) AS t5
+                ON t4.player_id = t5.batter) AS t7
+            LEFT JOIN
+                (SELECT striker as batter, count(*) as sixes
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=1 AND runs_scored = 6
+                GROUP BY striker) AS t6
+            ON t7.player_id = t6.batter
+            ORDER BY runs DESC;            
+          `,
+          [req.params.id]
         );
         const i2_batter = await db.query(
-          `SELECT player_id, player_name, runs, balls_faced, strike_rate
-            FROM player
-            INNER JOIN
-            (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+          `
+            SELECT player_id, player_name, runs, balls_faced, strike_rate, fours, COALESCE(sixes, 0) AS sixes
             FROM
-            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
-            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
-            GROUP BY striker) AS t2) AS t3
-            ON player.player_id = t3.batter;`,
+                (SELECT t4.player_id, t4.player_name, t4.runs, t4.balls_faced, strike_rate, COALESCE(fours, 0) AS fours
+                FROM
+                    (SELECT player_id, player_name, runs, balls_faced, strike_rate
+                    FROM player
+                    INNER JOIN
+                        (SELECT batter, runs, balls_faced, ROUND(((100.0*runs)/balls_faced), 2) AS strike_rate
+                        FROM
+                            (SELECT striker AS batter, SUM(runs_scored) AS runs, COUNT(*) AS balls_faced
+                            FROM (SELECT * FROM ball_by_ball WHERE match_id=$1 AND innings_no=2) AS t1
+                            GROUP BY striker) AS t2) AS t3
+                    ON player.player_id = t3.batter) AS t4
+                LEFT JOIN
+                    (SELECT striker as batter, count(*) as fours
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=2 AND runs_scored = 4
+                    GROUP BY striker) AS t5
+                ON t4.player_id = t5.batter) AS t7
+            LEFT JOIN
+                (SELECT striker as batter, count(*) as sixes
+                FROM ball_by_ball
+                WHERE match_id = $1 AND innings_no=2 AND runs_scored = 6
+                GROUP BY striker) AS t6
+            ON t7.player_id = t6.batter
+            ORDER BY runs DESC;
+            `,
           [req.params.id]
         );
 
         const i1_bowler = await db.query(
-          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
-            FROM ball_by_ball
-            WHERE match_id = $1 AND innings_no=1
-            GROUP BY bowler;`,
+            `
+            SELECT player.player_id, player.player_name, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+            FROM player
+            INNER JOIN
+                (SELECT t1.bowler, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+                FROM
+                    (SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored) AS runs_given
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=1
+                    GROUP BY bowler) AS t1
+                LEFT JOIN
+                    (SELECT bowler, COUNT(*) AS wickets
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                    GROUP BY bowler) AS t2
+                ON t1.bowler = t2.bowler) AS t4
+            ON player.player_id=t4.bowler;
+            `,
           [req.params.id]
         );
 
         const i2_bowler = await db.query(
-          `SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored+extra_runs) AS runs_given
-            FROM ball_by_ball
-            WHERE match_id = $1 AND innings_no=2
-            GROUP BY bowler;`,
+          `
+            SELECT player.player_id, player.player_name, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+            FROM player
+            INNER JOIN
+                (SELECT t1.bowler, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
+                FROM
+                    (SELECT bowler, COUNT(*) AS balls_bowled, SUM(runs_scored) AS runs_given
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=2
+                    GROUP BY bowler) AS t1
+                LEFT JOIN
+                    (SELECT bowler, COUNT(*) AS wickets
+                    FROM ball_by_ball
+                    WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                    GROUP BY bowler) AS t2
+                ON t1.bowler = t2.bowler) AS t4
+            ON player.player_id=t4.bowler;
+            `,
+          [req.params.id]
+        );
+
+
+
+        const first_batting_bowling = await db.query(
+          `
+            SELECT *
+            FROM
+                (SELECT first_batting, team_name as first_bowling
+                FROM team
+                INNER JOIN
+                    (SELECT firstbatting, firstbowling, team_name as first_batting
+                    FROM team
+                    INNER JOIN
+                        (SELECT Firstbatting,
+                            CASE 
+                                WHEN Firstbatting=team1 THEN team2
+                                ELSE team1
+                            END
+                            AS Firstbowling
+                        FROM
+                            (SELECT team1, team2, toss_winner, toss_name,
+                                CASE
+                                    WHEN ((team1=toss_winner AND toss_name='bat') OR (team2=toss_winner AND toss_name='field')) THEN team1
+                                    ELSE team2
+                                END
+                                AS Firstbatting
+                            FROM match
+                            WHERE match_id = $1) AS t1) AS t2
+                    ON team.team_id = t2.firstbatting) AS t3
+                ON team.team_id = t3.firstbowling) AS t8
+            CROSS JOIN
+                (SELECT *
+                FROM
+                    (SELECT *
+                    FROM
+                        (SELECT COUNT(*) AS second_innings_wicket
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=2 and out_type!='NULL') AS t1
+                    CROSS JOIN
+                        (SELECT SUM(extra_runs) AS innings_two_extra_runs, SUM(runs_scored+extra_runs) AS innings_two_runs
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=2) AS t2) AS t3
+                CROSS JOIN
+                    (SELECT *
+                    FROM
+                        (SELECT COUNT(*) AS first_innings_wicket
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=1 and out_type!='NULL') AS t1
+                    CROSS JOIN
+                        (SELECT SUM(extra_runs) AS innings_one_extra_runs, SUM(runs_scored+extra_runs) AS innings_one_runs
+                        FROM ball_by_ball
+                        WHERE match_id = $1 and innings_no=1) AS t2) AS t4) AS t9;
+        `,
+          [req.params.id]
+        );
+
+
+        const matchInfo = await db.query(
+        `
+        SELECT match_id, season_year, teamOne, teamTwo, venue_name, city_name, country_name, concat(toss_winner_team, ' won the toss and opt to ', toss_name, ' first')as toss
+        FROM
+            (SELECT match_id, season_year, toss_name, teamOne, teamTwo, toss_winner_team, venue_name, city_name, country_name
+            FROM
+                (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, teamTwo, team_name as toss_winner_team
+                FROM
+                    (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, team_name as teamTwo
+                    FROM
+                        (SELECT match_id, season_year, team1, team2, venue_id, toss_name, toss_winner, team.team_name as teamOne
+                        FROM match, team
+                        WHERE match_id = $1 AND team1=team.team_id) AS t1
+                    INNER JOIN team
+                    ON team.team_id = team2) AS t2
+                INNER JOIN team
+                ON toss_winner=team_id) AS t3
+            INNER JOIN venue
+            ON t3.venue_id = venue.venue_id) AS t4;
+        `,
+          [req.params.id]
+        );
+
+        
+        const umpires = await db.query(
+        `
+        SELECT umpire.umpire_id, umpire_name, role_desc
+        FROM
+            (SELECT umpire_id, role_desc FROM umpire_match WHERE match_id = $1) AS t1
+        INNER JOIN umpire
+        ON t1.umpire_id = umpire.umpire_id;
+        `,
+          [req.params.id]
+        );
+
+
+        const teamOnePlayers = await db.query(
+          `
+        SELECT player.player_id, player_name, role_desc
+        FROM
+            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team1 FROM match WHERE match_id=$1)) AS t1
+        INNER JOIN player
+        ON player.player_id=t1.player_id;
+        `,
+          [req.params.id]
+        );
+
+        const teamTwoPlayers = await db.query(
+          `
+        SELECT player.player_id, player_name, role_desc
+        FROM
+            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team2 FROM match WHERE match_id=$1)) AS t1
+        INNER JOIN player
+        ON player.player_id=t1.player_id;
+        `,
           [req.params.id]
         );
 
         res.status(200).json({
-            status:"sucess",
-            results: i1_batter.rows.length,  ///////////////////  see what to set this to /////////
-            data: {
-                "inningOneBatter": i1_batter.rows,
-                "inningTwoBatter": i2_batter.rows,
-                "inningOneBowler": i1_bowler.rows,
-                "inningTwoBowler": i2_bowler.rows,
-            },
+          status: "sucess",
+          results: i1_batter.rows.length, ///////////////////  see what to set this to /////////
+          data: {
+            inningOneBatter: i1_batter.rows,
+            inningTwoBatter: i2_batter.rows,
+            inningOneBowler: i1_bowler.rows,
+            inningTwoBowler: i2_bowler.rows,
+            firstBattingBowling: first_batting_bowling.rows,
+            matchInfo: matchInfo.rows,
+            umpires: umpires.rows,
+            teamOnePlayers: teamOnePlayers.rows,
+            teamTwoPlayers: teamTwoPlayers.rows,
+          },
         });
     }
     catch(err) {
@@ -210,7 +678,7 @@ app.get("/pointstable/:year", async (req, res) => {
                     LEFT JOIN
                         (SELECT match_winner AS team_id, COUNT(*) AS won
                         FROM match
-                        WHERE season_year=$1
+                        WHERE season_year= $1
                         GROUP BY match_winner) AS t2
                     ON t1.team_id = t2.team_id) AS t3
                 LEFT JOIN
@@ -230,7 +698,7 @@ app.get("/pointstable/:year", async (req, res) => {
             FROM
                 (SELECT team_id, team_name, SUM(runs_scored) AS total_runs_scored, SUM(overs_faced) AS total_overs_faced
                 FROM(
-                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored+extra_runs) AS runs_scored, MAX(over_id) AS overs_faced
                     FROM
                         (SELECT *
                         FROM
@@ -244,7 +712,7 @@ app.get("/pointstable/:year", async (req, res) => {
                     WHERE innings_no=1
                     GROUP BY t2.team_id, t2.team_name, t2.match_id)
                     UNION
-                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored, MAX(over_id) AS overs_faced
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored+extra_runs) AS runs_scored, MAX(over_id) AS overs_faced
                     FROM
                         (SELECT *
                         FROM
@@ -261,7 +729,7 @@ app.get("/pointstable/:year", async (req, res) => {
             INNER JOIN
                 (SELECT team_id, team_name, SUM(runs_scored_against) AS total_runs_scored_against, SUM(overs_faced_against) AS total_overs_faced_against
                 FROM(
-                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored+extra_runs) AS runs_scored_against, MAX(over_id) AS overs_faced_against
                     FROM
                         (SELECT *
                         FROM
@@ -275,7 +743,7 @@ app.get("/pointstable/:year", async (req, res) => {
                     WHERE innings_no=2
                     GROUP BY t2.team_id, t2.team_name, t2.match_id)
                     UNION
-                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored) AS runs_scored_against, MAX(over_id) AS overs_faced_against
+                    (SELECT t2.team_id, t2.team_name, t2.match_id, SUM(runs_scored+extra_runs) AS runs_scored_against, MAX(over_id) AS overs_faced_against
                     FROM
                         (SELECT *
                         FROM

@@ -7,9 +7,13 @@ import { Line, } from "react-chartjs-2";
 
 export const ScoreComparison = (props) => {
     const parameters = useParams();
-    const { scoreComparison, scoreComparisonTwo } = useContext(ScoreComparisonContext);
+    const { scoreComparison, scoreComparisonTwo, InningOneWickets, InningTwoWickets, FirstBattingBowling, Won } = useContext(ScoreComparisonContext);
     const [ firstInningRuns, setFirstInningRuns] = scoreComparison
     const [ secondInningRuns, setSecondInningRuns] = scoreComparisonTwo
+    const [ inningOneWickets, setInningOneWickets ] = InningOneWickets
+    const [ inningTwoWickets, setInningTwoWickets ] = InningTwoWickets
+    const [ firstBattingBowling, setFirstBattingBowling] = FirstBattingBowling
+    const [ won, setWon ] = Won
 
     useEffect( () => {
         const fetchData = async() => {
@@ -17,6 +21,10 @@ export const ScoreComparison = (props) => {
                 const response = await Path.get(`/matches/score_comparison/${parameters.id}`);
                 setFirstInningRuns(response.data.data.inningOne);
                 setSecondInningRuns(response.data.data.inningTwo);
+                setInningOneWickets(response.data.data.inningOneWickets);
+                setInningTwoWickets(response.data.data.inningTwoWickets);
+                setFirstBattingBowling(response.data.data.firstBattingBowling);
+                setWon(response.data.data.won);
             } 
             finally {
             }
@@ -30,35 +38,68 @@ export const ScoreComparison = (props) => {
             labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
             datasets: [
             {
-                label: 'Runs',
+                label: firstBattingBowling.map(el => el.first_batting),
                 backgroundColor: 'rgba(75,192,192,1)',
-                borderColor: 'rgba(0,0,0,1)',
+                borderColor: 'rgb(75, 192, 192)',
                 borderWidth: 2,
-                data: firstInningRuns.map(el => el.runs)
+                data: firstInningRuns.map(el => el.total_score),
+                pointRadius: inningOneWickets.map(el => el.dotradius),
             },
             {
-                label: 'Runs',
-                backgroundColor: 'rgba(75,192,192,1)',
-                borderColor: 'rgba(0,0,0,1)',
+                label: firstBattingBowling.map(el => el.first_bowling),
+                backgroundColor: 'rgb(255,0,0)',
+                borderColor: 'rgb(255,0,0)',
                 borderWidth: 2,
-                data: secondInningRuns.map(el => el.runs)
+                data: secondInningRuns.map(el => el.total_score),
+                pointRadius: inningTwoWickets.map(el => el.dotradius),
             }
             ]
         }}
         options={{
             plugins:{
-            title:{
-            display:true,
-            text:'Runs Scored in each match',
-            fontSize:20
+                title:{
+                display:true,
+                text:'Runs',
+                fontSize:20
+                },
+                
+                legend:{
+                display:true,
+                position:'right'
+                }
             },
-            legend:{
-            display:true,
-            position:'right'
-            }}
+
+            // scales: {
+            // xAxes: [{
+            //     display: true,
+            //     ticks: {
+            //     userCallback: function(label, index, labels) {
+            //         if(typeof label === "string")
+            //     {
+            //         return label.substring(0,1)
+            //     }
+            //         return label
+            //     },
+            //     },
+            //     scaleLabel: {
+            //     display: true,
+            //     labelString: 'Month'
+            //     }
+            // }],
+            // yAxes: [{
+            //     display: true,
+            //     scaleLabel: {
+            //     display: true,
+            //     labelString: ['Value', 'rar']
+            //     }
+            // }]
+            // }
+
+            
         }}
         />
 
+    <h2>{won.map(el => el.won)}</h2>
   </div>
   );
 };
