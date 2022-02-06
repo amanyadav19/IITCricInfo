@@ -5,7 +5,7 @@ import Match_Summary_Stats from '../components/MatchSummaryStats';
 
 export const Match_info = () => {
   const [ showScoreCompare, setShowScoreCompare ] = useState(false);
-  const [ showMatchSummary, setShowMatchSummary ] = useState(true);
+  const [ showMatchSummary, setShowMatchSummary ] = useState(false);
   
   const handleShowCompare = () => {
     setShowMatchSummary(false);
@@ -19,7 +19,7 @@ export const Match_info = () => {
 
 
   return (<div>
-    <center><h1>Scoreboard</h1></center>
+    <center><h1 style={{margin:20, fontSize:70}}>Scoreboard</h1></center>
       <MatchStats />
 
   <div class="container-fluid py-5">

@@ -3,6 +3,7 @@ import Path from "../apis/Path";
 import {MatchesContext} from "../context/MatchesContext";
 import { useHistory } from "react-router-dom";
 
+
 export const Match_list = (props) => {
     const history = useHistory();
     const {matches, setMatches} = useContext(MatchesContext);
@@ -24,9 +25,9 @@ export const Match_list = (props) => {
 
   return (
   <>
-  <center><h1>
+  <center><b><h1 style={{fontFamily: 'sans-serif'}}>
       Match List
-  </h1>
+  </h1></b>
   </center>
 
   <div class="container-fluid table-responsive py-5">

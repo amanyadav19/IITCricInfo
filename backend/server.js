@@ -267,7 +267,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
         );
 
         const inningOneBowler = await db.query(
-        `
+          `
         SELECT player_name, player_id, wickets_taken, runs_given
         FROM
             player
@@ -276,7 +276,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             FROM
                 (SELECT bowler, COUNT(*) AS wickets_taken
                 FROM ball_by_ball
-                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
                 (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
@@ -292,7 +292,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
         );
 
         const inningTwoBowler = await db.query(
-        `
+          `
         SELECT player_name, player_id, wickets_taken, runs_given
         FROM
             player
@@ -301,7 +301,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             FROM
                 (SELECT bowler, COUNT(*) AS wickets_taken
                 FROM ball_by_ball
-                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
                 (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
@@ -478,7 +478,7 @@ app.get("/matches/:id", async (req, res) => {
         );
 
         const i1_bowler = await db.query(
-            `
+          `
             SELECT player.player_id, player.player_name, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
             FROM player
             INNER JOIN
@@ -491,7 +491,7 @@ app.get("/matches/:id", async (req, res) => {
                 LEFT JOIN
                     (SELECT bowler, COUNT(*) AS wickets
                     FROM ball_by_ball
-                    WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                    WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                     GROUP BY bowler) AS t2
                 ON t1.bowler = t2.bowler) AS t4
             ON player.player_id=t4.bowler;
@@ -513,7 +513,7 @@ app.get("/matches/:id", async (req, res) => {
                 LEFT JOIN
                     (SELECT bowler, COUNT(*) AS wickets
                     FROM ball_by_ball
-                    WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                    WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                     GROUP BY bowler) AS t2
                 ON t1.bowler = t2.bowler) AS t4
             ON player.player_id=t4.bowler;

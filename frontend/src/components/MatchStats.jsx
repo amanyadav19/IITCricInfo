@@ -18,6 +18,16 @@ export const MatchStats = (props) => {
     const [teamOnePlayers, setTeamOnePlayers] = TeamOnePlayers;
     const [teamTwoPlayers, setTeamTwoPlayers] = TeamTwoPlayers;
 
+    const ColoredLine = ({ color, height }) => (
+    <hr
+        style={{
+            color: color,
+            backgroundColor: color,
+            height: height
+        }}
+    />
+);
+
     
     useEffect( () => {
         const fetchData = async() => {
@@ -40,19 +50,24 @@ export const MatchStats = (props) => {
     }, []);
 
     const handlePlayerSelect = (id) => {
-        history.push(`/players/${id}`); //////////// see this
+        history.push(`/players/${id}`);
     }
 
-  return (<div className="list-group">
+  return (<div>
+    <ColoredLine color="grey" height={0.5}/>
 
-    <center><h3>Innings 1</h3></center>
+    <div class="container">
 
+    <center><h1 style={{margin:20}}><b>Inning 1</b></h1></center>
+
+    <div class="row">
+
+    <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h5>Batting: {el.first_batting}</h5>
+    <h6>Batting: {el.first_batting}</h6>
     )})}</center>
 
-  <div class="container-fluid table-responsive py-5">
-  <div class="table-resposive"> 
+  <div class="container-fluid table-responsive py-3">
   <table className="table table-hover table-bordered table-striped">      
     <thead className="thead-dark">
         <tr>
@@ -78,13 +93,13 @@ export const MatchStats = (props) => {
   </table>
   </div>
   </div>
-
+    
+    <div class="col">
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h5>Bowling: {el.first_bowling}</h5>
+    <h6 style={{margin:10}}>Bowling: {el.first_bowling}</h6>
     )})}</center>
 
-    <div class="container-fluid table-responsive py-5">
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
         <thead className="thead-dark">
             <tr>
@@ -108,29 +123,30 @@ export const MatchStats = (props) => {
     </table>
     </div>
     </div>
+    </div>
 
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <>
+    <><h3>
     <b>Total Score: {el.innings_one_runs}({el.first_innings_wicket})
     <br/>
     Extras: {el.innings_one_extra_runs}
     </b>
+    </h3>
     </>
+    )})}</center>    
+
+
+    <ColoredLine color="grey" height={0.1}/>
+    <center><h1 style={{margin:20}}><b>Inning 2</b></h1></center>
+
+    <div class="row">
+    <div class="col">
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h6>Batting: {el.first_bowling}</h6>
     )})}</center>
 
 
-    <hr/>
-
-    <center><h3>Innings 2</h3></center>
-
-    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h5>Batting: {el.first_bowling}</h5>
-    )})}
-    </center>
-    
-
-    <div class="container-fluid table-responsive py-5">
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
     <thead className="thead-dark">
         <tr>
@@ -155,12 +171,14 @@ export const MatchStats = (props) => {
     </tbody>
   </table>
   </div>
-  </div>
+    </div>
+    
+    <div class="col">
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h6 style={{margin:10}}>Bowling: {el.first_batting}</h6>
+    )})}</center>
 
-
-
-    <div class="container-fluid table-responsive py-5">
-    <div class="table-resposive">
+    <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
     <thead className="thead-dark">
         <tr className="bg-primary">
@@ -185,21 +203,25 @@ export const MatchStats = (props) => {
   </div>
   </div>
 
+    </div>
     <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
-    <>
+    <><h3>
     <b>Total Score: {el.innings_two_runs}({el.second_innings_wicket})
     <br/>
     Extras: {el.innings_two_extra_runs}
     </b>
+    </h3>
     </>
     )})}</center>
 
-    
-    <hr/>
-    <center><h1>Match Information</h1></center>
+    </div>
 
-    <div class="container-fluid table-responsive py-5">
-    <div class="table-resposive">
+    <ColoredLine color="grey" height={0.1}/>
+
+
+    <center><h1 style={{margin:40}}>Match Information</h1></center>
+
+    <div class="container-fluid table-responsive">
     <table className="table table-hover table-bordered table-striped">
     <thead className="thead-dark">
         <tr className="bg-primary">
@@ -259,7 +281,8 @@ export const MatchStats = (props) => {
     </tbody>
   </table>
   </div>
-  </div>
+
+    <ColoredLine color="grey" height={0.05}/>
 
 </div>);
 };

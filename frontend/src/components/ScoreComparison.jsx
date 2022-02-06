@@ -73,35 +73,7 @@ export const ScoreComparison = (props) => {
                 display:true,
                 position:'right'
                 }
-            },
-
-            // scales: {
-            // xAxes: [{
-            //     display: true,
-            //     ticks: {
-            //     userCallback: function(label, index, labels) {
-            //         if(typeof label === "string")
-            //     {
-            //         return label.substring(0,1)
-            //     }
-            //         return label
-            //     },
-            //     },
-            //     scaleLabel: {
-            //     display: true,
-            //     labelString: 'Month'
-            //     }
-            // }],
-            // yAxes: [{
-            //     display: true,
-            //     scaleLabel: {
-            //     display: true,
-            //     labelString: ['Value', 'rar']
-            //     }
-            // }]
-            // }
-
-            
+            },            
         }}
         />
     </div>
