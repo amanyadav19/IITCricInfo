@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 export const Match_Summary_Stats = (props) => {
     const parameters = useParams();
     const history = useHistory();
-    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler, Won } = useContext(MatchSummaryContext);
+    const { MatchSummary, ExtraRuns, MatchSummaryTwo, ExtraRunsTwo, InningOneBatter, InningTwoBatter, InningOneBowler, InningTwoBowler, Won, MatchInfo, AllOne } = useContext(MatchSummaryContext);
     const [ matchSummary, setMatchSummary] = MatchSummary
     const [ extraRuns, setExtraRuns] = ExtraRuns
     const [ matchSummaryTwo, setMatchSummaryTwo] = MatchSummaryTwo
@@ -19,7 +19,9 @@ export const Match_Summary_Stats = (props) => {
     const [inningOneBowler, setInningOneBowler] = InningOneBowler;
     const [inningTwoBowler, setInningTwoBowler] = InningTwoBowler;
     const [ won, setWon ] = Won
-
+    const [ matchInfo, setMatchInfo ] = MatchInfo;
+    const [ allOne, setAllOne ] = AllOne
+    
     useEffect( () => {
         const fetchData = async() => {
             try{
@@ -33,6 +35,9 @@ export const Match_Summary_Stats = (props) => {
                 setInningOneBowler(response.data.data.inningOneBowler);
                 setInningTwoBowler(response.data.data.inningTwoBowler);
                 setWon(response.data.data.won);
+                setMatchInfo(response.data.data.matchInfo);
+                setAllOne(matchSummary.map(el => el.runtype));
+                // matchSummary.push("extras");
             } 
             finally {
             }
@@ -47,7 +52,7 @@ export const Match_Summary_Stats = (props) => {
 
   return (
   <>
-  <h1>Team 1</h1>
+  <h1>{matchInfo.map(el => el.first_batting)}</h1>
     <table className="table table-hover bg-primary">
 
     <thead>
@@ -94,7 +99,7 @@ export const Match_Summary_Stats = (props) => {
   <div class="w-50 container fluid" >
      <Pie
           data={{
-            labels: matchSummary.map(el => el.runtype),
+            labels: {allOne},
             datasets: [
               {
                 label: 'Match Outline',
@@ -131,7 +136,7 @@ export const Match_Summary_Stats = (props) => {
   </div>
 
 
-  <h1>Team 2</h1>
+  <h1>{matchInfo.map(el => el.first_bowling)}</h1>
     <table className="table table-hover bg-primary">
 
     <thead>
@@ -215,9 +220,9 @@ export const Match_Summary_Stats = (props) => {
         />
 </div>
 
-            {won && won.map(el => {return(
+            <h2>{won && won.map(el => {return(
             <>{el.won}</>
-            )})}
+            )})}</h2>
 </>
 );
 };
