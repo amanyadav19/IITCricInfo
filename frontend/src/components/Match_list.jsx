@@ -19,12 +19,15 @@ export const Match_list = (props) => {
     }, []);
 
     const handleMatchSelect = (id) => {
-        history.push(`/matches/${id}`); //////////// see this
+        history.push(`/matches/${id}`);
     }
-  return (<div className="list-group">
-        <table className="table table-hover table-dark">
-            <thead>
-                <tr className="bg-primary">
+    
+  return (<div class="container-fluid">
+      <div class="card">
+        <div class="table-resposive">
+        <table className="table table-hover table-bordered table-striped" id="match_list">
+            <thead class="thead-dark">
+                <tr>
                     <th scope="col">Team 1</th>
                     <th scope="col">Team 2</th>
                     <th scope="col">Stadium Name</th>
@@ -45,6 +48,8 @@ export const Match_list = (props) => {
                 })}
             </tbody>
         </table>
+        </div>
+    </div>
   </div>);
 };
 
