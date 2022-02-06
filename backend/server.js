@@ -958,7 +958,9 @@ app.get("/players/bat_stat/:id", async (req, res) => {
 // batting statistics graph 
 app.get("/players/bat_stat_graph/:id", async (req, res) => {
     try{
-        const results = await db.query("select striker as player_id, match_id, sum(runs_scored) as runs_per_match from ball_by_ball where striker = $1 group by (striker, match_id) order by striker asc, match_id asc;", [req.params.id]);
+        const results = await db.query(`select * from (select player_id, match_id, runs_per_match, '#FF0000' as color from (select striker as player_id, match_id, sum(runs_scored) as runs_per_match from ball_by_ball where striker = $1 group by (striker, match_id) order by striker asc, match_id asc) as A where runs_per_match < 30) as A1 union 
+        select * from (select player_id, match_id, runs_per_match, '#0000FF' as color from (select striker as player_id, match_id, sum(runs_scored) as runs_per_match from ball_by_ball where striker = $1 group by (striker, match_id) order by striker asc, match_id asc) as A where runs_per_match >= 30 and runs_per_match <= 50) as A2 union 
+        select * from (select player_id, match_id, runs_per_match, '#00FF00' as color from (select striker as player_id, match_id, sum(runs_scored) as runs_per_match from ball_by_ball where striker = $1 group by (striker, match_id) order by striker asc, match_id asc) as A where runs_per_match > 50) as A3;`, [req.params.id]);
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,

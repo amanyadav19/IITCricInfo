@@ -16,11 +16,17 @@ export const PlayerBowlingStatistics = (props) => {
         };
         fetchData();
     }, []);
-  return (<div className="list-group">
-  <table className="table table-hover bg-primary">
-      <tr><td>Matches</td><td>Runs</td><td>Wickets</td><td>Overs</td><td>Balls</td><td>Economy</td><td>Five Wickets</td></tr>
+  return (<div class="container-fluid">
+  <div class="table-responsive">
+  <table className="table table-hover table-bordered table-striped">
+      <thead class="thead-dark">
+      <tr><th>Matches</th><th>Runs</th><th>Wickets</th><th>Overs</th><th>Balls</th><th>Economy</th><th>Five Wickets</th></tr>
+      </thead>
+      <tbody>
       <tr><td>{playerBowl.total_matches}</td><td>{playerBowl.runs}</td><td>{playerBowl.wickets}</td><td>{playerBowl.overs}</td><td>{playerBowl.balls}</td><td>{playerBowl.economy}</td><td>{playerBowl.five_wickets}</td></tr>
+      </tbody>
   </table>
+  </div>
 </div>);
 };
 

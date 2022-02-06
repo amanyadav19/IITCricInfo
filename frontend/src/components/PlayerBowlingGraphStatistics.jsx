@@ -26,21 +26,23 @@ export const PlayerBowlingGraphStatistics = (props) => {
         {
             type: 'line',
             label: 'Wickets taken',
-            backgroundColor: 'rgba(75,192,192,1)',
+            backgroundColor: 'rgba(0,200,0,1)',
             borderColor: 'rgba(0,0,0,1)',
             borderWidth: 2,
             data: playerBowlGraph.map(el => el.wickets),
+        
         },
         {
             type: 'bar',
             label: 'Runs Conceded',
-            backgroundColor: 'rgba(75,192,192,1)',
+            backgroundColor: 'rgba(0,0,255,1)',
             borderColor: 'rgba(0,0,0,1)',
             borderWidth: 2,
             data: playerBowlGraph.map(el => el.runs_scored),
           }
       ]
     }}
+    width = {"500%"}
     options={{
         plugins:{
       title:{
@@ -50,7 +52,7 @@ export const PlayerBowlingGraphStatistics = (props) => {
       },
       legend:{
         display:true,
-        position:'right'
+        position:'bottom'
       }}
     }}
   />

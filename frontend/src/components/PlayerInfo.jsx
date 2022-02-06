@@ -16,13 +16,17 @@ export const PlayerInfo = (props) => {
         };
         fetchData();
     }, []);
-  return (<div className="list-group">
-  <table className="table table-hover bg-primary">
+  return (<div class="container-fluid">
+    <div class="table-responsive">
+    <table className="table table-hover table-bordered table-striped">
+        <tbody>
       <tr><td>Player Name</td><td>{player.player_name}</td></tr>
       <tr><td>Country</td><td>{player.country_name}</td></tr>
       <tr><td>Batting Style</td><td>{player.batting_hand}</td></tr>
       <tr><td>Bowling Skill</td><td>{player.bowling_skill}</td></tr>
+      </tbody>
   </table>
+  </div>
 </div>);
 };
 

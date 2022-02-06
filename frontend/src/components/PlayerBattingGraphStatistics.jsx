@@ -19,15 +19,14 @@ export const PlayerBattingGraphStatistics = (props) => {
         };
         fetchData();
     }, []);
-  return (<div>
+  return (<div class="container" >
       <Bar
           data={{
             labels: playerBatGraph.map(el => el.match_id),
             datasets: [
               {
                 label: 'Runs',
-                backgroundColor: 'rgba(75,192,192,1)',
-                borderColor: 'rgba(0,0,0,1)',
+                backgroundColor: playerBatGraph.map(el => el.color),
                 borderWidth: 2,
                 data: playerBatGraph.map(el => el.runs_per_match)
               }
@@ -42,9 +41,10 @@ export const PlayerBattingGraphStatistics = (props) => {
             },
             legend:{
               display:true,
-              position:'right'
+              position:'bottom'
             }}
           }}
+          width={"170%"}
         />
 </div>);
 };

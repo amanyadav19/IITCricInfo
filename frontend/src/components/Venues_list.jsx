@@ -21,10 +21,11 @@ export const Venues_list = (props) => {
     const handleVenueSelect = (id) => {
         history.push(`/venue/${id}`);
     }
-  return (<div className="list-group">
-        <table className="table table-hover table-dark">
-            <thead>
-                <tr className="bg-primary">
+  return (<div class="container-fluid">
+  <div class="table-responsive">
+  <table className="table table-hover table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
                     <th scope="col">Venue Names</th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@ export const Venues_list = (props) => {
                 })}
             </tbody>
         </table>
+  </div>
   </div>);
 };
 

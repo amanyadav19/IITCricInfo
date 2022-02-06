@@ -8,20 +8,36 @@ import PlayerBowlingGraphStatistics from '../components/PlayerBowlingGraphStatis
 
 export const Player_info = () => {
   return (<div>
-    <h2>
+    <br></br>
+    <center><h3>
       Player Basic Information
-    </h2>
+    </h3>
+    </center>
       <PlayerInfo/>
-      <h2>
-      Player Batting statistics
-    </h2>
-      <PlayerBattingStatistics/>
-      <PlayerBattingGraphStatistics/>
-      <h2>
-       Player Bowling statistics
-    </h2>
+      <br></br>
+      <center><h3>
+            Player Batting Statistics
+            </h3>
+            </center>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm">
+          <PlayerBattingStatistics/>
+          </div>
+          <div class="col-sm">
+          <PlayerBattingGraphStatistics/>
+          </div>
+        </div>
+      </div>
+      <br></br>
+      <center><h3>
+            Player Bowling Statistics
+            </h3>
+            </center>
       <PlayerBowlingStatistics/>
+      <div width="30%" >
       <PlayerBowlingGraphStatistics/>
+      </div>
   </div>);
 };
 

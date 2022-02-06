@@ -17,8 +17,11 @@ export const PlayerBattingStatistics = (props) => {
         };
         fetchData();
     }, []);
-  return (<div className="list-group">
-  <table className="table table-hover bg-primary">
+  return (
+      <div>
+  <div class="table-responsive">
+  <table className="table table-hover table-bordered table-striped">
+      <tbody>
       <tr><td>Matches</td><td>{playerBat.matches_played}</td></tr>
       <tr><td>Runs</td><td>{playerBat.total_runs}</td></tr>
       <tr><td>Four</td><td>{playerBat.fours}</td></tr>
@@ -27,7 +30,9 @@ export const PlayerBattingStatistics = (props) => {
       <tr><td>HS</td><td>{playerBat.hs}</td></tr>
       <tr><td>Strike rate</td><td>{playerBat.strike_rate}</td></tr>
       <tr><td>Average</td><td>{playerBat.average}</td></tr>
+      </tbody>
   </table>
+</div>
 </div>);
 };
 

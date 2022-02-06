@@ -17,8 +17,9 @@ export const Venue_stat_basic_info = (props) => {
         };
         fetchData();
     }, []);
-  return (<div className="list-group">
-  <table className="table table-hover bg-primary">
+  return (<div class="container-fluid">
+  <div class="table-responsive">
+  <table className="table table-hover table-bordered table-striped">
       <tr><td>Venue Name</td><td>{venue.venue_name}</td></tr>
       <tr><td>Venue Address</td><td>{venue.city_name}, {venue.country_name}</td></tr>
       <tr><td>Capacity</td><td>{venue.capacity}</td></tr>
@@ -27,6 +28,7 @@ export const Venue_stat_basic_info = (props) => {
       <tr><td>Lowest total recorded</td><td>{venue.min_total}</td></tr>
       <tr><td>Highest scored chased</td><td>{venue.max_runs_chased}</td></tr>
   </table>
+</div>
 </div>);
 };
 
