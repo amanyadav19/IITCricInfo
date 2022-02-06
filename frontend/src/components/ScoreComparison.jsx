@@ -32,7 +32,13 @@ export const ScoreComparison = (props) => {
         fetchData();
     }, []);
   return (
-  <div className="list-group">
+    <>
+  <div class="container-fluid py-5">
+
+    <center><h2>Score Comparison</h2></center>
+
+  <div class="container-fluid py-5">
+
         <Line
         data={{
             labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
@@ -98,9 +104,10 @@ export const ScoreComparison = (props) => {
             
         }}
         />
-
-    <h2>{won.map(el => el.won)}</h2>
-  </div>
+    </div>
+    <center><h4>{won.map(el => el.won)}</h4></center>
+    </div>
+  </>
   );
 };
 

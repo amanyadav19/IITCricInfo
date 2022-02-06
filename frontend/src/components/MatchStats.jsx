@@ -45,15 +45,17 @@ export const MatchStats = (props) => {
 
   return (<div className="list-group">
 
-    <h3>Innings 1</h3>
+    <center><h3>Innings 1</h3></center>
 
-    {firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h2>Batting: {el.first_batting}</h2>
-    )})}
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h5>Batting: {el.first_batting}</h5>
+    )})}</center>
 
-  <table className="table table-hover bg-primary">      
-    <thead>
-        <tr className="bg-primary">
+  <div class="container-fluid table-responsive py-5">
+  <div class="table-resposive"> 
+  <table className="table table-hover table-bordered table-striped">      
+    <thead className="thead-dark">
+        <tr>
             <th scope="col">Batter</th>
             <th scope="col">Runs</th>
             <th scope="col">Fours</th>
@@ -63,8 +65,8 @@ export const MatchStats = (props) => {
     </thead>
     <tbody>
         {firstInningBat && firstInningBat.map(el => {return(
-            <tr key = {el.player_id}  onClick={() => handlePlayerSelect(el.player_id)}>
-            <td>{el.player_name}</td>
+            <tr key = {el.player_id}>
+            <td onClick={() => handlePlayerSelect(el.player_id)}><a href="">{el.player_name}</a></td>
             <td>{el.runs}</td>
             <td>{el.fours}</td>
             <td>{el.sixes}</td>
@@ -74,11 +76,18 @@ export const MatchStats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
+  </div>
 
-    <h2>Bowling</h2>
-    <table className="table table-hover bg-primary">
-        <thead>
-            <tr className="bg-primary">
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h5>Bowling: {el.first_bowling}</h5>
+    )})}</center>
+
+    <div class="container-fluid table-responsive py-5">
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+        <thead className="thead-dark">
+            <tr>
                 <th scope="col">Bowler</th>
                 <th scope="col">Balls Bowled</th>
                 <th scope="col">Runs Given</th>
@@ -88,7 +97,7 @@ export const MatchStats = (props) => {
         <tbody>
             {firstInningBowl && firstInningBowl.map(el => {return(
                 <tr key = {el.bowler} onClick={() => handlePlayerSelect(el.player_id)}>
-                <td>{el.player_name}</td>
+                <td onClick={() => handlePlayerSelect(el.player_id)}><a href="">{el.player_name}</a></td>
                 <td>{el.balls_bowled}</td>
                 <td>{el.runs_given}</td>
                 <td>{el.wickets}</td>
@@ -97,25 +106,34 @@ export const MatchStats = (props) => {
             })}
         </tbody>
     </table>
+    </div>
+    </div>
 
-    {firstBattingBowling && firstBattingBowling.map(el => {return(
-    <>Extra Runs: {el.innings_one_extra_runs}
-    <p>Score: {el.innings_one_runs}</p>
-    Wickets: {el.first_innings_wicket}</>
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <>
+    <b>Total Score: {el.innings_one_runs}({el.first_innings_wicket})
+    <br/>
+    Extras: {el.innings_one_extra_runs}
+    </b>
+    </>
+    )})}</center>
+
+
+    <hr/>
+
+    <center><h3>Innings 2</h3></center>
+
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h5>Batting: {el.first_bowling}</h5>
     )})}
-
-
-    <h3>Innings 2</h3>
-
-    {firstBattingBowling && firstBattingBowling.map(el => {return(
-    <h2>Batting: {el.first_bowling}</h2>
-    )})}
+    </center>
     
 
-
-  <table className="table table-hover bg-primary">
-    <thead>
-        <tr className="bg-primary">
+    <div class="container-fluid table-responsive py-5">
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+    <thead className="thead-dark">
+        <tr>
             <th scope="col">Batter</th>
             <th scope="col">Runs</th>
             <th scope="col">Fours</th>
@@ -125,8 +143,8 @@ export const MatchStats = (props) => {
     </thead>
     <tbody>
         {secondInningBat && secondInningBat.map(el => {return(
-            <tr key = {el.player_id} onClick={() => handlePlayerSelect(el.player_id)}>
-            <td>{el.player_name}</td>
+            <tr key = {el.player_id}>
+            <td onClick={() => handlePlayerSelect(el.player_id)}><a href="">{el.player_name}</a></td>
             <td>{el.runs}</td>
             <td>{el.fours}</td>
             <td>{el.sixes}</td>
@@ -136,12 +154,15 @@ export const MatchStats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
+  </div>
 
 
 
-    <table className="table table-hover bg-primary">
-
-    <thead>
+    <div class="container-fluid table-responsive py-5">
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+    <thead className="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Bowler</th>
             <th scope="col">Balls Bowled</th>
@@ -151,8 +172,8 @@ export const MatchStats = (props) => {
     </thead>
     <tbody>
         {secondInningBowl && secondInningBowl.map(el => {return(
-            <tr key = {el.bowler} onClick={() => handlePlayerSelect(el.player_id)}>
-            <td>{el.player_name}</td>
+            <tr key = {el.bowler}>
+            <td onClick={() => handlePlayerSelect(el.player_id)}><a href="">{el.player_name}</a></td>
             <td>{el.balls_bowled}</td>
             <td>{el.runs_given}</td>
             <td>{el.wickets}</td>
@@ -161,21 +182,26 @@ export const MatchStats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
+  </div>
 
+    <center>{firstBattingBowling && firstBattingBowling.map(el => {return(
+    <>
+    <b>Total Score: {el.innings_two_runs}({el.second_innings_wicket})
+    <br/>
+    Extras: {el.innings_two_extra_runs}
+    </b>
+    </>
+    )})}</center>
 
-    {firstBattingBowling && firstBattingBowling.map(el => {return(
-    <>Extra Runs: {el.innings_two_extra_runs}
-    <p>Score: {el.innings_two_runs}</p>
-    Wickets: {el.second_innings_wicket}</>
-    )
-    })}
+    
+    <hr/>
+    <center><h1>Match Information</h1></center>
 
-
-    <h1>Match Information</h1>
-
-    <table className="table table-hover bg-primary">
-
-    <thead>
+    <div class="container-fluid table-responsive py-5">
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+    <thead className="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Field</th>
             <th scope="col">Information</th>
@@ -232,6 +258,8 @@ export const MatchStats = (props) => {
         </tr>
     </tbody>
   </table>
+  </div>
+  </div>
 
 </div>);
 };

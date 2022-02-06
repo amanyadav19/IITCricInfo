@@ -45,10 +45,18 @@ export const Match_Summary_Stats = (props) => {
 
   return (
   <>
-  <h1>{matchInfo.map(el => el.first_batting)}</h1>
-    <table className="table table-hover bg-primary">
+    <center><h1>Match Summary</h1></center>
+  <div class="container">
+  <div class="row">
+    <div class="col">
+    <div class="container-fluid py-5">
 
-    <thead>
+    <center><h5>{matchInfo.map(el => el.first_batting)}</h5> </center>
+
+  <div class="container-fluid table-responsive py-5">
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+        <thead class="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Batter</th>
             <th scope="col">Runs Scored</th>
@@ -66,11 +74,12 @@ export const Match_Summary_Stats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
 
 
-    <table className="table table-hover bg-primary">
-
-    <thead>
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+        <thead class="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Bowler</th>
             <th scope="col">Wickets Taken</th>
@@ -88,8 +97,9 @@ export const Match_Summary_Stats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
   
-  <div class="w-50 container fluid" >
+  <div class="w-50 container-fluid table-responsive py-5" >
      <Pie
           data={{
             labels: matchSummary.map(el => el.runtype),
@@ -127,12 +137,16 @@ export const Match_Summary_Stats = (props) => {
           }}}
         />
   </div>
+  </div>
 
+</div>
+<div class="col">
 
-  <h1>{matchInfo.map(el => el.first_bowling)}</h1>
-    <table className="table table-hover bg-primary">
+  <center><h5>{matchInfo.map(el => el.first_bowling)}</h5> </center>
 
-    <thead>
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+        <thead class="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Batter</th>
             <th scope="col">Runs Scored</th>
@@ -150,11 +164,12 @@ export const Match_Summary_Stats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
 
 
-    <table className="table table-hover bg-primary">
-
-    <thead>
+    <div class="table-resposive">
+    <table className="table table-hover table-bordered table-striped">
+        <thead class="thead-dark">
         <tr className="bg-primary">
             <th scope="col">Bowler</th>
             <th scope="col">Wickets Taken</th>
@@ -172,8 +187,9 @@ export const Match_Summary_Stats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
 
-  <div class="w-50 container fluid" >
+  <div class="w-50 container-fluid table-responsive py-5" >
 
     <Pie
           data={{
@@ -213,9 +229,14 @@ export const Match_Summary_Stats = (props) => {
         />
 </div>
 
-            <h2>{won && won.map(el => {return(
-            <>{el.won}</>
-            )})}</h2>
+    <center><h4>{won.map(el => el.won)}</h4></center>
+
+    
+</div>
+    
+</div>
+</div>
+</div>
 </>
 );
 };

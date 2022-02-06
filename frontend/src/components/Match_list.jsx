@@ -21,9 +21,15 @@ export const Match_list = (props) => {
     const handleMatchSelect = (id) => {
         history.push(`/matches/${id}`);
     }
-    
-  return (<div class="container-fluid">
-      <div class="card">
+
+  return (
+  <>
+  <center><h1>
+      Match List
+  </h1>
+  </center>
+
+  <div class="container-fluid table-responsive py-5">
         <div class="table-resposive">
         <table className="table table-hover table-bordered table-striped" id="match_list">
             <thead class="thead-dark">
@@ -48,9 +54,11 @@ export const Match_list = (props) => {
                 })}
             </tbody>
         </table>
-        </div>
     </div>
-  </div>);
+  </div>
+  
+  </>
+  );
 };
 
 export default Match_list;
