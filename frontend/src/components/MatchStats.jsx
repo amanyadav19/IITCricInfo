@@ -45,12 +45,11 @@ export const MatchStats = (props) => {
 
   return (<div className="list-group">
 
-    <h3>Innings One</h3>
+    <h3>Innings 1</h3>
 
-            {firstBattingBowling && firstBattingBowling.map(el => {return(
-            <h2>{el.first_batting}</h2>
-            )
-            })}
+    {firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h2>Batting: {el.first_batting}</h2>
+    )})}
 
   <table className="table table-hover bg-primary">      
     <thead>
@@ -76,44 +75,45 @@ export const MatchStats = (props) => {
     </tbody>
   </table>
 
+    <h2>Bowling</h2>
     <table className="table table-hover bg-primary">
-
-    <thead>
-        <tr className="bg-primary">
-            <th scope="col">Bowler</th>
-            <th scope="col">Balls Bowled</th>
-            <th scope="col">Runs Given</th>
-            <th scope="col">Wickets</th>
-        </tr>
-    </thead>
-    <tbody>
-        {secondInningBowl && secondInningBowl.map(el => {return(
-            <tr key = {el.bowler} onClick={() => handlePlayerSelect(el.player_id)}>
-            <td>{el.player_name}</td>
-            <td>{el.balls_bowled}</td>
-            <td>{el.runs_given}</td>
-            <td>{el.wickets}</td>
+        <thead>
+            <tr className="bg-primary">
+                <th scope="col">Bowler</th>
+                <th scope="col">Balls Bowled</th>
+                <th scope="col">Runs Given</th>
+                <th scope="col">Wickets</th>
             </tr>
-        )
-        })}
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            {firstInningBowl && firstInningBowl.map(el => {return(
+                <tr key = {el.bowler} onClick={() => handlePlayerSelect(el.player_id)}>
+                <td>{el.player_name}</td>
+                <td>{el.balls_bowled}</td>
+                <td>{el.runs_given}</td>
+                <td>{el.wickets}</td>
+                </tr>
+            )
+            })}
+        </tbody>
+    </table>
 
     {firstBattingBowling && firstBattingBowling.map(el => {return(
     <>Extra Runs: {el.innings_one_extra_runs}
     <p>Score: {el.innings_one_runs}</p>
     Wickets: {el.first_innings_wicket}</>
-    )
-    })}
+    )})}
 
 
-        {firstBattingBowling && firstBattingBowling.map(el => {return(
-            <h2>{el.first_bowling}</h2>
-            )
-            })}
+    <h3>Innings 2</h3>
+
+    {firstBattingBowling && firstBattingBowling.map(el => {return(
+    <h2>Batting: {el.first_bowling}</h2>
+    )})}
+    
+
 
   <table className="table table-hover bg-primary">
-
     <thead>
         <tr className="bg-primary">
             <th scope="col">Batter</th>
@@ -137,6 +137,8 @@ export const MatchStats = (props) => {
     </tbody>
   </table>
 
+
+
     <table className="table table-hover bg-primary">
 
     <thead>
@@ -148,7 +150,7 @@ export const MatchStats = (props) => {
         </tr>
     </thead>
     <tbody>
-        {firstInningBowl && firstInningBowl.map(el => {return(
+        {secondInningBowl && secondInningBowl.map(el => {return(
             <tr key = {el.bowler} onClick={() => handlePlayerSelect(el.player_id)}>
             <td>{el.player_name}</td>
             <td>{el.balls_bowled}</td>
@@ -159,6 +161,7 @@ export const MatchStats = (props) => {
         })}
     </tbody>
   </table>
+
 
     {firstBattingBowling && firstBattingBowling.map(el => {return(
     <>Extra Runs: {el.innings_two_extra_runs}
@@ -195,6 +198,14 @@ export const MatchStats = (props) => {
             )})}
         </td>
         </tr>
+        <tr key = "venue">
+        <td>Venue:</td>
+        <td>
+            {matchInfo && matchInfo.map(el => {return(
+            <>{el.venue_name}, {el.city_name}, {el.country_name}</>
+            )})}
+        </td>
+        </tr>
         <tr key = "umpires">
         <td>Umpires:</td>
         <td>
@@ -207,7 +218,7 @@ export const MatchStats = (props) => {
         <td>Playing XI of team1:</td>
         <td>
             {teamOnePlayers && teamOnePlayers.map(el => {return(
-            <>{el.player_name}</>
+            <>{el.player_name} {(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>} </>
             )})}
         </td>
         </tr>
@@ -215,7 +226,7 @@ export const MatchStats = (props) => {
         <td>Playing XI of team2:</td>
         <td>
             {teamTwoPlayers && teamTwoPlayers.map(el => {return(
-            <>{el.player_name}</>
+            <>{el.player_name} {(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>} </>
             )})}
         </td>
         </tr>
