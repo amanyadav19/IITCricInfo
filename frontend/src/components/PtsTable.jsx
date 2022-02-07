@@ -18,8 +18,10 @@ export const PtsTable = (props) => {
         fetchData();
     }, []);
 
-return (  
-    <div class="container-fluid table-responsive py-5">
+return (
+    <>
+    <center><h1 style={{margin:30}}>Points Table</h1></center>
+    <div class="container-fluid table-responsive py-3 container">
         <div class="table-resposive">
         <table className="table table-hover table-bordered table-striped">
             <thead class="thead-dark">
@@ -49,7 +51,9 @@ return (
             </tbody>
         </table>
         </div>
-    </div>);
+    </div>
+    </>
+    );
 };
 
 export default PtsTable;
