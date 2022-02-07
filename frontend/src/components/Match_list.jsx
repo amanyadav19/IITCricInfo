@@ -82,16 +82,21 @@ export const Match_list = (props) => {
   </div>
 
 
-  <div class="container-fluid">
+  <div class="container w-25">
 
     <center>
-    <button type="button" class="btn btn-primary" onClick={() => handlePrev()}>
+    <div class="row">
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg " onClick={() => handlePrev()}>
         Previous
     </button>
-    ----------
-    <button type="button" class="btn btn-primary" onClick={() => handleNext()}>
+    </div>
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg" onClick={() => handleNext()}>
         Next
     </button>
+    </div>
+    </div>
     </center>
   </div>
   </>
