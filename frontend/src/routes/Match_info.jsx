@@ -19,7 +19,7 @@ export const Match_info = () => {
 
   return (<div>
 
-    <center><h1 style={{margin:20, fontSize:70}}>Scoreboard</h1></center>
+    <center><h1 style={{margin:20, fontSize:70}}>Scorecard</h1></center>
       <MatchStats />
 
 
