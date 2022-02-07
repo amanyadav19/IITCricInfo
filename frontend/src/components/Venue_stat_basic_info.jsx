@@ -20,6 +20,7 @@ export const Venue_stat_basic_info = (props) => {
   return (<div class="container-fluid">
   <div class="table-responsive">
   <table className="table table-hover table-bordered table-striped">
+      <tbody>
       <tr><td>Venue Name</td><td>{venue.venue_name}</td></tr>
       <tr><td>Venue Address</td><td>{venue.city_name}, {venue.country_name}</td></tr>
       <tr><td>Capacity</td><td>{venue.capacity}</td></tr>
@@ -27,6 +28,7 @@ export const Venue_stat_basic_info = (props) => {
       <tr><td>Highest total recorded</td><td>{venue.max_total}</td></tr>
       <tr><td>Lowest total recorded</td><td>{venue.min_total}</td></tr>
       <tr><td>Highest scored chased</td><td>{venue.max_runs_chased}</td></tr>
+      </tbody>
   </table>
 </div>
 </div>);

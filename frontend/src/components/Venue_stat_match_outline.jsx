@@ -19,7 +19,7 @@ export const Venue_stat_match_outline = (props) => {
         };
         fetchData();
     }, []);
-  return (<div class="w-50 container fluid" >
+  return (<div>
      <Pie
           data={{
             labels: ['Team batting 1st won', 'Team batting 2nd won', 'Draw'],

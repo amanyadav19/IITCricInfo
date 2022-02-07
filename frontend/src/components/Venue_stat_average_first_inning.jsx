@@ -20,7 +20,7 @@ export const Venue_stat_average_first_inning = (props) => {
         };
         fetchData();
     }, []);
-  return (<div class="w-50 container fluid" >
+  return (<div>
              <Line
           data={{
             labels: venueInning.map(el => el.season_year),
@@ -36,6 +36,7 @@ export const Venue_stat_average_first_inning = (props) => {
               }
             ]
           }}
+          width={"150%"}
           options={{
             title:{
               display:true,

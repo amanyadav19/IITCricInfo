@@ -1,6 +1,6 @@
 import './App.css';
 import React from "react";
-import {BrowserRouter as Router, Switch, Route} from "react-router-dom"
+import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom"
 import Matches from './routes/Matches';
 import Venues from './routes/Venues';
 import Venue_stats from './routes/Venue_stats';
@@ -19,6 +19,7 @@ import { PlayerBowlingContextProvider } from './context/PlayerBowlingContext';
 import { PlayerBattingGraphContextProvider } from './context/PlayerBattingGraphContext';
 import { PlayerBowlingGraphContextProvider } from './context/PlayerBowlingGraphContext';
 import { MatchContextProvider } from './context/MatchContext';
+import { Navbar,Nav,NavDropdown,Form,FormControl,Button } from 'react-bootstrap'
 
 import Match_info from './routes/Match_info';
 import Player_info from './routes/Player_info';
@@ -40,13 +41,33 @@ function App() {
     <ScoreComparisonContextProvider>
     <MatchSummaryContextProvider>
     <PointsTabelContextProvider>
-    <div className='container'>
+    <div>
     <head>
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"></link>
       <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"></link>
       </head>
       <Router>
-        <Switch>
+      <Navbar bg="dark" variant="dark" sticky="top">
+                                <Navbar.Brand href="#home">IITCricInfo</Navbar.Brand>
+                                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                                <Navbar.Collapse id="basic-navbar-nav">
+                                    <Nav className="ml-auto">
+                                    <Nav.Link href="/matches">Matches</Nav.Link>
+                                    <Nav.Link href="/venues">Venues</Nav.Link>
+                                    <Nav.Link href="/venues/add">Add Venue</Nav.Link>
+                                    <NavDropdown title="Points Table" id="basic-nav-dropdown">
+                                        <NavDropdown.Item href="/pointstable/2011">2011</NavDropdown.Item>
+                                        <NavDropdown.Item href="/pointstable/2013">2013</NavDropdown.Item>
+                                        <NavDropdown.Item href="/pointstable/2015">2015</NavDropdown.Item>
+                                        <NavDropdown.Item href="/pointstable/2017">2017</NavDropdown.Item>
+                                    </NavDropdown>
+                                    </Nav>
+                                </Navbar.Collapse>
+                            </Navbar>
+                            <br />
+        <Switch><Route exact path="/">
+        <Redirect to="/matches"/>
+        </Route>
           <Route exact path="/matches" component={Matches}/>
           <Route exact path="/matches/:id" component={Match_info}/>
           <Route exact path="/venues" component={Venues}/>

@@ -181,7 +181,6 @@ app.get("/matches/score_comparison/:id", async (req, res) => {
         [req.params.id]
     );
 
-    console.log(inningOne.rows);
     res.status(200).json({
       status: "sucess",
       results: inningOne.rows.length,
@@ -819,7 +818,6 @@ app.get("/venue/info/:id", async (req, res) => {
             from
             venue where venue_id = $1;`, [req.params.id]);
         }
-        console.log(results);
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,
@@ -883,7 +881,6 @@ app.get("/venue/inning/:id", async (req, res) => {
 
 // adding a venue
 app.post("/venues", async (req, res) => {
-    console.log(req.body);
     try{
         const results = await db.query("Insert into venue(venue_name, city_name, country_name, capacity) values($1, $2, $3, $4) returning *", [req.body.venue_name, req.body.city_name, req.body.country_name, req.body.capacity]);
         res.status(201).json({
@@ -941,7 +938,6 @@ app.get("/players/bat_stat/:id", async (req, res) => {
         if(results.rows.length == 0) { 
             results = await db.query(`select $1 as player_id, 0 as matches_played, 0 as total_runs, 0 as fours, 0 as sixes, 0 as fifties, 0 as HS, 0 as strike_rate, 0 as average;`, [req.params.id]);
         }
-        console.log(results);
         res.status(200).json({ 
             status:"sucess",
             results: results.rows.length,
