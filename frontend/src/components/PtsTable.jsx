@@ -20,7 +20,8 @@ export const PtsTable = (props) => {
 
 return (
     <>
-    <center><h1 style={{margin:30}}>Points Table</h1></center>
+    <center><h1 style={{margin:20, fontSize:50}}>Points Table - {parameters.year}</h1></center>
+
     <div class="container-fluid table-responsive py-3 container">
         <div class="table-resposive">
         <table className="table table-hover table-bordered table-striped">
