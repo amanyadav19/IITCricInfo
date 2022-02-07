@@ -59,11 +59,11 @@ export const Match_list = (props) => {
         <table className="table table-hover table-bordered table-striped" id="match_list">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Team 1</th>
-                    <th scope="col">Team 2</th>
-                    <th scope="col">Stadium Name</th>
-                    <th scope="col">City Name</th>
-                    <th scope="col">Result</th>
+                    <th scope="col" class="col-2">Team 1</th>
+                    <th scope="col" class="col-2">Team 2</th>
+                    <th scope="col" class="col-3">Stadium Name</th>
+                    <th scope="col" class="col-2">City Name</th>
+                    <th scope="col" class="col-3">Result</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,16 +82,21 @@ export const Match_list = (props) => {
   </div>
 
 
-  <div class="container-fluid">
+  <div class="container w-25">
 
     <center>
-    <button type="button" class="btn btn-primary" onClick={() => handlePrev()}>
+    <div class="row">
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg " onClick={() => handlePrev()}>
         Previous
     </button>
-    ----------
-    <button type="button" class="btn btn-primary" onClick={() => handleNext()}>
+    </div>
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg" onClick={() => handleNext()}>
         Next
     </button>
+    </div>
+    </div>
     </center>
   </div>
   </>
