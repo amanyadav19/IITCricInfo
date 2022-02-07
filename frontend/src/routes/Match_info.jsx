@@ -17,23 +17,31 @@ export const Match_info = () => {
     setShowMatchSummary(true);
   }
 
-
   return (<div>
-    <center><h1 style={{margin:20, fontSize:70}}>Scoreboard</h1></center>
+
+    <center><h1 style={{margin:20, fontSize:70}}>Scorecard</h1></center>
       <MatchStats />
+
 
   <div class="container-fluid py-5">
 
+  <div class="container w-25">
     <center>
-    <button type="button" class="btn btn-primary" onClick={() => handleShowCompare()}>
+    <div class="row">
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg" onClick={() => handleShowCompare()}>
       Score Comparison
     </button>
-    -------
-    <button type="button" class="btn btn-primary" onClick={() => handleMatchSummary()}>
+    </div>
+    <div class="col">
+    <button type="button" class="btn btn-primary btn-lg" onClick={() => handleMatchSummary()}>
       Match Summary
     </button>
+    </div>
+    </div>
     </center>
-    <br/>
+  </div>
+
     { showScoreCompare ? <ScoreComparison /> : null }
     { showMatchSummary ? <Match_Summary_Stats /> : null }
     </div>

@@ -291,7 +291,7 @@ export const MatchStats = (props) => {
         <td>Playing XI of team1:</td>
         <td>
             {teamOnePlayers && teamOnePlayers.map(el => {return(
-            <>{el.player_name} {(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>} </>
+            <><span>&#8226;</span> {el.player_name}{(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>}  </>
             )})}
         </td>
         </tr>
@@ -299,7 +299,7 @@ export const MatchStats = (props) => {
         <td>Playing XI of team2:</td>
         <td>
             {teamTwoPlayers && teamTwoPlayers.map(el => {return(
-            <>{el.player_name} {(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>} </>
+            <><span>&#8226;</span> {el.player_name}{(el.role_desc=='Captain' || el.role_desc=='Keeper' || el.role_desc=='CaptainKeeper') && <>({el.role_desc})</>}  </>
             )})}
         </td>
         </tr>
