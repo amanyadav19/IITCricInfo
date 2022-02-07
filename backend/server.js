@@ -866,14 +866,19 @@ app.get("/venues", async (req, res) => {
 // get a particular venue basic info
 app.get("/venue/info/:id", async (req, res) => {
     try{
-        var results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max(total_runs) as max_total, min(total_runs) as min_total, max_runs_chased
+        var results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max(total_runs1) as max_total, min(total_runs2) as min_total, max_runs_chased
         from
-        venue, (select venue_id, A.match_id, total_runs
+        venue, (select A.match_id, total_runs1, match.venue_id
                 from 
-                    (select match_id, sum(runs_scored + extra_runs) as total_runs 
+                    (select match_id, max(r) as total_runs1
                     from 
-                    ball_by_ball group by match_id) as A, match where A.match_id = match.match_id) as B, 
-                (select cast($1 as int) as venue_id, coalesce(max(runs_chased),0) as max_runs_chased from (select max(venue_id) as venue_id, A.match_id, max(total_runs) as runs_chased 
+                    (select match_id, innings_no, sum(runs_scored+extra_runs) as r from ball_by_ball group by(match_id, innings_no)) as Alpha group by match_id) as A, match where A.match_id = match.match_id) as B, 
+					(select match.venue_id, A.match_id, total_runs2
+                from 
+                    (select match_id, min(r) as total_runs2
+                    from 
+                    (select match_id, innings_no, sum(runs_scored+extra_runs) as r from ball_by_ball group by(match_id, innings_no)) as beta group by match_id) as A, match where A.match_id = match.match_id) as G,
+                 (select cast($1 as int) as venue_id, coalesce(max(runs_chased),0) as max_runs_chased from (select max(venue_id) as venue_id, A.match_id, max(total_runs) as runs_chased 
                 from 
                     (select match_id , sum(runs_scored + extra_runs) as total_runs 
                     from ball_by_ball where innings_no = 1 group by match_id) as A, match 
@@ -882,7 +887,7 @@ app.get("/venue/info/:id", async (req, res) => {
                 from
                 venue, match where venue.venue_id = match.venue_id group by venue.venue_id) as D 			
         where 
-        venue.venue_id = D.venue_id and venue.venue_id = B.venue_id and venue.venue_id = C.venue_id and venue.venue_id = $1 group by (venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max_runs_chased);`, [req.params.id]);
+        venue.venue_id = D.venue_id and venue.venue_id = B.venue_id and venue.venue_id = G.venue_id and venue.venue_id = C.venue_id and venue.venue_id = $1 group by (venue.venue_id, venue_name, city_name, country_name, capacity, matches_played, max_runs_chased);`, [req.params.id]);
         if(results.rows.length == 0) { 
             results = await db.query(`select venue.venue_id, venue_name, city_name, country_name, capacity, '0' as matches_played, '0' as max_total, '0' as min_total, '0' as max_runs_chased
             from
