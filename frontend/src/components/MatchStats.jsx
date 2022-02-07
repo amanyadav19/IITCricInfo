@@ -140,7 +140,7 @@ export const MatchStats = (props) => {
     )})}
     {inningOneOvers && inningOneOvers.map(el => {return(
     <><h3>
-    <b>Overs: {el.over_id}.{el.ball_id}
+    <b>Overs Played: {el.over_id}
     <br/>
     </b>
     </h3>
@@ -231,7 +231,7 @@ export const MatchStats = (props) => {
     
     {inningTwoOvers && inningTwoOvers.map(el => {return(
     <><h3>
-    <b>Overs: {el.over_id}.{el.ball_id}
+    <b>Overs Played: {el.over_id}
     <br/>
     </b>
     </h3>

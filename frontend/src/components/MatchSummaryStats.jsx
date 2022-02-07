@@ -45,11 +45,13 @@ export const Match_Summary_Stats = (props) => {
 
   return (
   <>
-  <center><h1 style={{margin:20}}>Match Summary</h1></center>
+  <center><h1 style={{margin:40}}>Match Summary</h1></center>
 
   <div class="container-fluid" style={{paddingLeft:50, paddingRight:50}}>
   <div class="row">
   <div class="col">
+
+  <div clas="row" style={{height:"225px"}}>
   <center><h5 style={{margin:10}}><b>{matchInfo.map(el => el.first_batting)}</b></h5> </center>
 
   <div class="container-fluid table-responsive py-3">
@@ -73,7 +75,9 @@ export const Match_Summary_Stats = (props) => {
     </tbody>
   </table>
   </div>
+  </div>
 
+  <div clas="row" style={{height:"225px"}}>
 
     <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">
@@ -95,6 +99,7 @@ export const Match_Summary_Stats = (props) => {
         })}
     </tbody>
   </table>
+  </div>
   </div>
   
   <div class="w-75 container-fluid" >
@@ -139,6 +144,8 @@ export const Match_Summary_Stats = (props) => {
   </div> {/* col */}
 
   <div class="col">
+
+  <div claa="row" style={{height:"225px"}}>
   <center><h5 style={{margin:10}}><b>{matchInfo.map(el => el.first_bowling)}</b></h5> </center>
 
     <div class="container-fluid table-responsive py-3">
@@ -162,6 +169,8 @@ export const Match_Summary_Stats = (props) => {
     </tbody>
   </table>
   </div>
+  </div>
+
 
     <div class="container-fluid table-responsive py-3">
     <table className="table table-hover table-bordered table-striped">

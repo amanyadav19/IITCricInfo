@@ -628,21 +628,18 @@ app.get("/matches/:id", async (req, res) => {
         );
 
         const inningOneOvers = await db.query(
-          `
-        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id
-        FROM ball_by_ball
-        WHERE match_id=$1 AND innings_no=1 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=1)
-        GROUP BY over_id;
+        `
+        SELECT MAX(over_id) as over_id 
+        FROM ball_by_ball WHERE match_id=$1 AND innings_no=1;
         `,
           [req.params.id]
         );
 
         const inningTwoOvers = await db.query(
-        `
-        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id
-        FROM ball_by_ball
-        WHERE match_id=$1 AND innings_no=2 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=2)
-        GROUP BY over_id;
+          `
+        SELECT MAX(over_id) as over_id 
+        FROM ball_by_ball WHERE match_id=$1 AND innings_no=2;
+
         `,
           [req.params.id]
         );
