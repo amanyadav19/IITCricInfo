@@ -19,7 +19,7 @@ export const PlayerBattingGraphStatistics = (props) => {
         };
         fetchData();
     }, []);
-  return (<div class="container" >
+  return (<div  >
       <Bar
           data={{
             labels: playerBatGraph.map(el => el.match_id),
@@ -44,7 +44,7 @@ export const PlayerBattingGraphStatistics = (props) => {
               position:'bottom'
             }}
           }}
-          width={"170%"}
+          width={"190%"}
         />
 </div>);
 };

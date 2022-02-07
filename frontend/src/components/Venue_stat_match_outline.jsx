@@ -48,7 +48,7 @@ export const Venue_stat_match_outline = (props) => {
             },
             legend:{
               display:true,
-              position:'right',
+              position:'bottom',
               fontSize:30
             }
           }}}

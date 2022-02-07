@@ -13,18 +13,20 @@ export const Player_info = () => {
       Player Basic Information
     </h3>
     </center>
+    <div class="container">
       <PlayerInfo/>
+      </div>
       <br></br>
       <center><h3>
             Player Batting Statistics
             </h3>
             </center>
       <div class="container">
-        <div class="row">
-          <div class="col-sm">
+        <div class="row container">
+          <div class="col">
           <PlayerBattingStatistics/>
           </div>
-          <div class="col-sm">
+          <div class="col">
           <PlayerBattingGraphStatistics/>
           </div>
         </div>
@@ -34,8 +36,10 @@ export const Player_info = () => {
             Player Bowling Statistics
             </h3>
             </center>
+      <div class="container">
       <PlayerBowlingStatistics/>
-      <div width="30%" >
+      </div>
+      <div width="30%" class="container">
       <PlayerBowlingGraphStatistics/>
       </div>
   </div>);

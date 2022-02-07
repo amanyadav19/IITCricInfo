@@ -7,30 +7,28 @@ import VenueStat2 from '../components/Venue_stat_match_outline';
 export const Venue_stats = () => {
   return <div>
     <br></br>
-    <center>
-    <h2>
-      Basic Information
-    </h2>
-    </center>
+
+    <center><h1 style={{margin:20, fontSize:40}}>Basic Information</h1></center>
+    <div class="container">
       <VenueStat1/>
+      </div>
       <br></br>
       <div class="container">
       <div class="row">
-        <div class="col-sm">
-          <center>
-          <h2>
-          Outline of matches
-          </h2>
-          </center>
+        <div class="col-sm container-fluid">
+        <center><h1 style={{margin:20, fontSize:40}}>Outline of matches</h1></center>
+        <center><div  class="chart-container py-5 w-75">
           <VenueStat2/>
-        </div>
-        <div class="col-sm">
-        <center>
-        <h2>
-        Average First Innings Score
-        </h2>
+          </div>
         </center>
+        </div>
+        <div class="col-sm chart-container">
+        <center><h1 style={{margin:20, fontSize:40}}>Average First Innings Score</h1></center>
+        <center>
+        <div  class="chart-container py-5 w-75">
         <VenueStat3/>
+        </div>
+        </center>
         </div>
       </div>
     </div>

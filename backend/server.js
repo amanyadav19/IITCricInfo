@@ -1045,7 +1045,7 @@ app.get("/players/bowl_stat/:id", async (req, res) => {
     try{
         var results = await db.query(`select A.bowler as player_id, total_matches, runs, balls, overs, wickets, round(economy, 2) as economy, five_wickets
         from 
-            (select bowler, count(distinct match_id) as total_matches, sum(runs_scored + extra_runs) as runs, Count(*) as balls, count(distinct(match_id, innings_no, over_id)) as overs, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets, sum(runs_scored + extra_runs)*1.0/count(distinct(match_id, innings_no, over_id)) as economy
+            (select bowler, count(distinct match_id) as total_matches, sum(runs_scored) as runs, Count(*) as balls, count(distinct(match_id, innings_no, over_id)) as overs, SUM(CASE WHEN out_type is not null and out_type != 'retired hurt' and out_type != 'run out' THEN 1 ELSE 0 END) as wickets, sum(runs_scored + extra_runs)*1.0/count(distinct(match_id, innings_no, over_id)) as economy
             from 
             ball_by_ball 
             group by bowler) as A, 

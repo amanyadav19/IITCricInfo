@@ -37,7 +37,7 @@ export const Create_venue_form = (props) => {
               Form to Add Venue
           </center>
       </h3>
-  <div className="mb-4 text-center">
+  <div className="mb-4 text-center container">
         <form action="">
             <div className="form-row">
                 <div className="col">

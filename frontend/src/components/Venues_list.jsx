@@ -21,7 +21,7 @@ export const Venues_list = (props) => {
     const handleVenueSelect = (id) => {
         history.push(`/venue/${id}`);
     }
-  return (<div class="container-fluid">
+  return (<div class="container" style={{width:"50%"}}>
       <br></br>
   <div class="table-responsive">
   <table className="table table-hover table-bordered table-striped">
