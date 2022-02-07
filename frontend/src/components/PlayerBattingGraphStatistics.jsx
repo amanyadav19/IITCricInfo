@@ -42,7 +42,15 @@ export const PlayerBattingGraphStatistics = (props) => {
             legend:{
               display:true,
               position:'bottom'
-            }}
+            }},
+            scales: {
+              y: [{
+                title: {
+                  display: true,
+                  text: 'Your Title'
+                }
+              }]
+            },
           }}
           width={"190%"}
         />
