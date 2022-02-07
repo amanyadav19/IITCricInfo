@@ -28,12 +28,12 @@ export const Match_info = () => {
   <div class="container w-25">
     <center>
     <div class="row">
-    <div class="col">
+    <div class="col" style={{margin:10}}>
     <button type="button" class="btn btn-primary btn-lg" onClick={() => handleShowCompare()}>
       Score Comparison
     </button>
     </div>
-    <div class="col">
+    <div class="col" style={{margin:10}}>
     <button type="button" class="btn btn-primary btn-lg" onClick={() => handleMatchSummary()}>
       Match Summary
     </button>
