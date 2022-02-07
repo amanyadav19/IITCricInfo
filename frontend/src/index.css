@@ -1,0 +1,12 @@
+html {
+    font-size: 14px;
+    width:100%;
+}
+
+.fill-window {
+    height: 100%;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+}

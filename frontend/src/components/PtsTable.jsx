@@ -18,9 +18,11 @@ export const PtsTable = (props) => {
         fetchData();
     }, []);
 
-return (<div className="list-group">
-        <table className="table table-hover table-dark">
-            <thead>
+return (  
+    <div class="container-fluid table-responsive py-5">
+        <div class="table-resposive">
+        <table className="table table-hover table-bordered table-striped">
+            <thead class="thead-dark">
                 <tr className="bg-primary">
                     <th scope="col">Team Name</th>
                     <th scope="col">Match Played</th>
@@ -33,7 +35,7 @@ return (<div className="list-group">
             </thead>
             <tbody>
                 {pointsTable && pointsTable.map(el => {return(
-                     <tr key = {el.team_id}>  {/*onClick={() => handleVenueSelect(el.venue_id)}   onClick={() =>getMatcheData(info.match_id)}*/}
+                     <tr key = {el.team_id}>
                     <td>{el.team_name}</td>
                     <td>{el.match_played}</td>
                     <td>{el.won}</td>
@@ -46,7 +48,8 @@ return (<div className="list-group">
                 })}
             </tbody>
         </table>
-  </div>);
+        </div>
+    </div>);
 };
 
 export default PtsTable;

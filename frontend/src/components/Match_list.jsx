@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import Path from "../apis/Path";
 import {MatchesContext} from "../context/MatchesContext";
 import { useHistory } from "react-router-dom";
@@ -6,11 +6,15 @@ import { useHistory } from "react-router-dom";
 export const Match_list = (props) => {
     const history = useHistory();
     const {matches, setMatches} = useContext(MatchesContext);
+    const [ currentPage, setCurrentPage ] = useState(0);
+    const [ maxPageNo, setMaxPageNo ] = useState();
+
     useEffect( () => {
         const fetchData = async() => {
             try{
                 const response = await Path.get("/matches/");
                 setMatches(response.data.data.matches);
+                setMaxPageNo(Math.ceil(response.data.data.totalResults/10.0));
             } 
             finally {
             }
@@ -18,13 +22,40 @@ export const Match_list = (props) => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchNewData = async() => {
+            try{
+                const response = await Path.get(`/matches/page/${currentPage}`);
+                setMatches(response.data.data.matches);
+            } 
+            finally {
+            }
+        };
+        fetchNewData();
+    }, [currentPage])
+    
     const handleMatchSelect = (id) => {
         history.push(`/matches/${id}`);
     }
-    
-  return (<div class="container-fluid">
-      <div class="card">
-        <div class="table-resposive">
+
+    const handlePrev = () => {
+        if(currentPage>0)
+            setCurrentPage(currentPage-1);
+    }
+
+    const handleNext = () => {
+        if(currentPage<maxPageNo-1)
+            setCurrentPage(currentPage+1);
+    }
+
+  return (
+  <>
+  <center><b><h1 style={{fontFamily: 'sans-serif', margin:30, fontSize:60}}>
+      Match List
+  </h1></b>
+  </center>
+
+  <div class="container-fluid table-responsive py-3" style={{paddingLeft:200, paddingRight:200}}>
         <table className="table table-hover table-bordered table-striped" id="match_list">
             <thead class="thead-dark">
                 <tr>
@@ -48,9 +79,23 @@ export const Match_list = (props) => {
                 })}
             </tbody>
         </table>
-        </div>
-    </div>
-  </div>);
+  </div>
+
+
+  <div class="container-fluid">
+
+    <center>
+    <button type="button" class="btn btn-primary" onClick={() => handlePrev()}>
+        Previous
+    </button>
+    ----------
+    <button type="button" class="btn btn-primary" onClick={() => handleNext()}>
+        Next
+    </button>
+    </center>
+  </div>
+  </>
+  );
 };
 
 export default Match_list;

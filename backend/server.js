@@ -32,8 +32,59 @@ app.get("/matches", async (req, res) => {
                     ON t2.match_winner = team.team_id) AS t3) AS t4
             INNER JOIN venue
             ON t4.venue_id = venue.venue_id
-            ORDER BY season_year DESC;
+            ORDER BY season_year DESC, match_id
+            LIMIT 10;
         `);
+
+        const resultsCount = await db.query(`
+        SELECT COUNT(*) FROM match;
+        `);
+        
+
+        res.status(200).json({
+          status: "sucess",
+          results: results.rows.length,
+          data: {
+            matches: results.rows,
+            totalResults: resultsCount.rows[0]["count"],
+          },
+        });
+    }
+    catch(err) {
+        console.log(err);
+    }
+});
+
+
+// get all matches
+app.get("/matches/page/:page_no", async (req, res) => {
+    try{
+        const results = await db.query(
+          `
+            SELECT match_id, team1_name AS Team1, team2_name AS Team2, venue_name AS stadium_name, city_name, result, season_year
+            FROM
+                (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, match_winner_name, concat(match_winner_name, ' won by ', ' ', win_margin, ' ', win_type) as result
+                FROM
+                    (SELECT match_id, season_year, venue_id, win_type, win_margin, team1_name, team2_name, team.team_name as match_winner_name
+                    FROM
+                        (SELECT match_id, season_year, venue_id, match_winner, win_type, win_margin, team1_name, team.team_name as team2_name
+                        FROM
+                            (SELECT match_id, season_year, team1, team2, venue_id, match_winner, win_type, win_margin, team_name as team1_name
+                            FROM match
+                            INNER JOIN team
+                            ON team1=team.team_id) AS t1
+                        INNER JOIN team
+                        ON team2=team.team_id) AS t2
+                    INNER JOIN team
+                    ON t2.match_winner = team.team_id) AS t3) AS t4
+            INNER JOIN venue
+            ON t4.venue_id = venue.venue_id
+            ORDER BY season_year DESC, match_id
+            OFFSET 10*$1
+            LIMIT 10;
+        `,
+          [req.params.page_no]
+        );
         res.status(200).json({
             status:"sucess",
             results: results.rows.length,
@@ -47,6 +98,7 @@ app.get("/matches", async (req, res) => {
     }
     
 });
+
 
 // get Score Comaprison Graph Stats for a match
 app.get("/matches/score_comparison/:id", async (req, res) => {
@@ -266,7 +318,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
         );
 
         const inningOneBowler = await db.query(
-        `
+          `
         SELECT player_name, player_id, wickets_taken, runs_given
         FROM
             player
@@ -275,7 +327,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             FROM
                 (SELECT bowler, COUNT(*) AS wickets_taken
                 FROM ball_by_ball
-                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
                 (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
@@ -291,7 +343,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
         );
 
         const inningTwoBowler = await db.query(
-        `
+          `
         SELECT player_name, player_id, wickets_taken, runs_given
         FROM
             player
@@ -300,7 +352,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
             FROM
                 (SELECT bowler, COUNT(*) AS wickets_taken
                 FROM ball_by_ball
-                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
                 (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
@@ -477,7 +529,7 @@ app.get("/matches/:id", async (req, res) => {
         );
 
         const i1_bowler = await db.query(
-            `
+          `
             SELECT player.player_id, player.player_name, balls_bowled, runs_given, COALESCE(wickets, 0) as wickets
             FROM player
             INNER JOIN
@@ -490,7 +542,7 @@ app.get("/matches/:id", async (req, res) => {
                 LEFT JOIN
                     (SELECT bowler, COUNT(*) AS wickets
                     FROM ball_by_ball
-                    WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL'
+                    WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                     GROUP BY bowler) AS t2
                 ON t1.bowler = t2.bowler) AS t4
             ON player.player_id=t4.bowler;
@@ -512,7 +564,7 @@ app.get("/matches/:id", async (req, res) => {
                 LEFT JOIN
                     (SELECT bowler, COUNT(*) AS wickets
                     FROM ball_by_ball
-                    WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL'
+                    WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                     GROUP BY bowler) AS t2
                 ON t1.bowler = t2.bowler) AS t4
             ON player.player_id=t4.bowler;
@@ -575,6 +627,25 @@ app.get("/matches/:id", async (req, res) => {
           [req.params.id]
         );
 
+        const inningOneOvers = await db.query(
+          `
+        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=1 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=1)
+        GROUP BY over_id;
+        `,
+          [req.params.id]
+        );
+
+        const inningTwoOvers = await db.query(
+        `
+        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id
+        FROM ball_by_ball
+        WHERE match_id=$1 AND innings_no=2 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=2)
+        GROUP BY over_id;
+        `,
+          [req.params.id]
+        );
 
         const matchInfo = await db.query(
         `
@@ -642,6 +713,8 @@ app.get("/matches/:id", async (req, res) => {
             inningTwoBatter: i2_batter.rows,
             inningOneBowler: i1_bowler.rows,
             inningTwoBowler: i2_bowler.rows,
+            inningOneOvers: inningOneOvers.rows,
+            inningTwoOvers: inningTwoOvers.rows,
             firstBattingBowling: first_batting_bowling.rows,
             matchInfo: matchInfo.rows,
             umpires: umpires.rows,

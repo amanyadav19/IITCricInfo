@@ -12,6 +12,8 @@ export const MatchContextProvider = (props) => {
   const [umpires, setUmpires] = useState([]);
   const [teamOnePlayers, setTeamOnePlayers] = useState([]);
   const [teamTwoPlayers, setTeamTwoPlayers] = useState([]);
+  const [inningOneOvers, setinningOneOvers] = useState([]);
+  const [inningTwoOvers, setinningTwoOvers] = useState([]);
 
   return (
     <MatchContext.Provider
@@ -25,6 +27,8 @@ export const MatchContextProvider = (props) => {
         Umpires: [umpires, setUmpires],
         TeamOnePlayers: [teamOnePlayers, setTeamOnePlayers],
         TeamTwoPlayers: [teamTwoPlayers, setTeamTwoPlayers],
+        InningOneOvers:[inningOneOvers, setinningOneOvers],
+        InningTwoOvers: [inningTwoOvers, setinningTwoOvers],
       }}
     >
       {props.children}

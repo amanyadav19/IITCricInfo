@@ -32,8 +32,16 @@ export const ScoreComparison = (props) => {
         fetchData();
     }, []);
   return (
-  <div className="list-group">
+    <>
+  <div class="container-fluid py-5">
+
+    <center><h1>Score Comparison</h1></center>
+
+  <div class="container chart-container py-5">
+
         <Line
+        // height="50px"
+        // width="50px"
         data={{
             labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
             datasets: [
@@ -65,42 +73,16 @@ export const ScoreComparison = (props) => {
                 
                 legend:{
                 display:true,
-                position:'right'
-                }
+                position:'top'
+                },
             },
-
-            // scales: {
-            // xAxes: [{
-            //     display: true,
-            //     ticks: {
-            //     userCallback: function(label, index, labels) {
-            //         if(typeof label === "string")
-            //     {
-            //         return label.substring(0,1)
-            //     }
-            //         return label
-            //     },
-            //     },
-            //     scaleLabel: {
-            //     display: true,
-            //     labelString: 'Month'
-            //     }
-            // }],
-            // yAxes: [{
-            //     display: true,
-            //     scaleLabel: {
-            //     display: true,
-            //     labelString: ['Value', 'rar']
-            //     }
-            // }]
-            // }
-
-            
+            maintainAspectRatio: true
         }}
         />
-
-    <h2>{won.map(el => el.won)}</h2>
-  </div>
+    </div>
+    <center><h5><b>{won.map(el => el.won)}</b></h5></center>
+    </div>
+  </>
   );
 };
 
