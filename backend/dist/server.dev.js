@@ -268,12 +268,12 @@ app.get("/matches/:id", function _callee5(req, res) {
         case 15:
           first_batting_bowling = _context5.sent;
           _context5.next = 18;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id\n        FROM ball_by_ball\n        WHERE match_id=$1 AND innings_no=1 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=1)\n        GROUP BY over_id;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT MAX(over_id) as over_id \n        FROM ball_by_ball WHERE match_id=$1 AND innings_no=1;\n        ", [req.params.id]));
 
         case 18:
           inningOneOvers = _context5.sent;
           _context5.next = 21;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id\n        FROM ball_by_ball\n        WHERE match_id=$1 AND innings_no=2 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=2)\n        GROUP BY over_id;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT MAX(over_id) as over_id \n        FROM ball_by_ball WHERE match_id=$1 AND innings_no=2;\n\n        ", [req.params.id]));
 
         case 21:
           inningTwoOvers = _context5.sent;
