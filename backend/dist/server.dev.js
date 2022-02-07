@@ -236,7 +236,7 @@ app.get("/matches/match_summary/:id", function _callee4(req, res) {
 }); // get match info
 
 app.get("/matches/:id", function _callee5(req, res) {
-  var i1_batter, i2_batter, i1_bowler, i2_bowler, first_batting_bowling, matchInfo, umpires, teamOnePlayers, teamTwoPlayers;
+  var i1_batter, i2_batter, i1_bowler, i2_bowler, first_batting_bowling, inningOneOvers, inningTwoOvers, matchInfo, umpires, teamOnePlayers, teamTwoPlayers;
   return regeneratorRuntime.async(function _callee5$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
@@ -268,24 +268,34 @@ app.get("/matches/:id", function _callee5(req, res) {
         case 15:
           first_batting_bowling = _context5.sent;
           _context5.next = 18;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT match_id, season_year, teamOne, teamTwo, venue_name, city_name, country_name, concat(toss_winner_team, ' won the toss and opt to ', toss_name, ' first')as toss\n        FROM\n            (SELECT match_id, season_year, toss_name, teamOne, teamTwo, toss_winner_team, venue_name, city_name, country_name\n            FROM\n                (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, teamTwo, team_name as toss_winner_team\n                FROM\n                    (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, team_name as teamTwo\n                    FROM\n                        (SELECT match_id, season_year, team1, team2, venue_id, toss_name, toss_winner, team.team_name as teamOne\n                        FROM match, team\n                        WHERE match_id = $1 AND team1=team.team_id) AS t1\n                    INNER JOIN team\n                    ON team.team_id = team2) AS t2\n                INNER JOIN team\n                ON toss_winner=team_id) AS t3\n            INNER JOIN venue\n            ON t3.venue_id = venue.venue_id) AS t4;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id\n        FROM ball_by_ball\n        WHERE match_id=$1 AND innings_no=1 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=1)\n        GROUP BY over_id;\n        ", [req.params.id]));
 
         case 18:
-          matchInfo = _context5.sent;
+          inningOneOvers = _context5.sent;
           _context5.next = 21;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT umpire.umpire_id, umpire_name, role_desc\n        FROM\n            (SELECT umpire_id, role_desc FROM umpire_match WHERE match_id = $1) AS t1\n        INNER JOIN umpire\n        ON t1.umpire_id = umpire.umpire_id;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT (over_id-1) as over_id, MAX(ball_id) as ball_id\n        FROM ball_by_ball\n        WHERE match_id=$1 AND innings_no=2 AND over_id=(SELECT MAX(over_id) FROM ball_by_ball WHERE match_id=$1 AND innings_no=2)\n        GROUP BY over_id;\n        ", [req.params.id]));
 
         case 21:
-          umpires = _context5.sent;
+          inningTwoOvers = _context5.sent;
           _context5.next = 24;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT player.player_id, player_name, role_desc\n        FROM\n            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team1 FROM match WHERE match_id=$1)) AS t1\n        INNER JOIN player\n        ON player.player_id=t1.player_id;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT match_id, season_year, teamOne, teamTwo, venue_name, city_name, country_name, concat(toss_winner_team, ' won the toss and opt to ', toss_name, ' first')as toss\n        FROM\n            (SELECT match_id, season_year, toss_name, teamOne, teamTwo, toss_winner_team, venue_name, city_name, country_name\n            FROM\n                (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, teamTwo, team_name as toss_winner_team\n                FROM\n                    (SELECT match_id, season_year, venue_id, toss_name, toss_winner, teamOne, team_name as teamTwo\n                    FROM\n                        (SELECT match_id, season_year, team1, team2, venue_id, toss_name, toss_winner, team.team_name as teamOne\n                        FROM match, team\n                        WHERE match_id = $1 AND team1=team.team_id) AS t1\n                    INNER JOIN team\n                    ON team.team_id = team2) AS t2\n                INNER JOIN team\n                ON toss_winner=team_id) AS t3\n            INNER JOIN venue\n            ON t3.venue_id = venue.venue_id) AS t4;\n        ", [req.params.id]));
 
         case 24:
-          teamOnePlayers = _context5.sent;
+          matchInfo = _context5.sent;
           _context5.next = 27;
-          return regeneratorRuntime.awrap(db.query("\n        SELECT player.player_id, player_name, role_desc\n        FROM\n            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team2 FROM match WHERE match_id=$1)) AS t1\n        INNER JOIN player\n        ON player.player_id=t1.player_id;\n        ", [req.params.id]));
+          return regeneratorRuntime.awrap(db.query("\n        SELECT umpire.umpire_id, umpire_name, role_desc\n        FROM\n            (SELECT umpire_id, role_desc FROM umpire_match WHERE match_id = $1) AS t1\n        INNER JOIN umpire\n        ON t1.umpire_id = umpire.umpire_id;\n        ", [req.params.id]));
 
         case 27:
+          umpires = _context5.sent;
+          _context5.next = 30;
+          return regeneratorRuntime.awrap(db.query("\n        SELECT player.player_id, player_name, role_desc\n        FROM\n            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team1 FROM match WHERE match_id=$1)) AS t1\n        INNER JOIN player\n        ON player.player_id=t1.player_id;\n        ", [req.params.id]));
+
+        case 30:
+          teamOnePlayers = _context5.sent;
+          _context5.next = 33;
+          return regeneratorRuntime.awrap(db.query("\n        SELECT player.player_id, player_name, role_desc\n        FROM\n            (SELECT player_id, role_desc FROM player_match WHERE match_id = $1 AND team_id = (SELECT team2 FROM match WHERE match_id=$1)) AS t1\n        INNER JOIN player\n        ON player.player_id=t1.player_id;\n        ", [req.params.id]));
+
+        case 33:
           teamTwoPlayers = _context5.sent;
           res.status(200).json({
             status: "sucess",
@@ -296,6 +306,8 @@ app.get("/matches/:id", function _callee5(req, res) {
               inningTwoBatter: i2_batter.rows,
               inningOneBowler: i1_bowler.rows,
               inningTwoBowler: i2_bowler.rows,
+              inningOneOvers: inningOneOvers.rows,
+              inningTwoOvers: inningTwoOvers.rows,
               firstBattingBowling: first_batting_bowling.rows,
               matchInfo: matchInfo.rows,
               umpires: umpires.rows,
@@ -303,20 +315,20 @@ app.get("/matches/:id", function _callee5(req, res) {
               teamTwoPlayers: teamTwoPlayers.rows
             }
           });
-          _context5.next = 34;
+          _context5.next = 40;
           break;
 
-        case 31:
-          _context5.prev = 31;
+        case 37:
+          _context5.prev = 37;
           _context5.t0 = _context5["catch"](0);
           console.log(_context5.t0);
 
-        case 34:
+        case 40:
         case "end":
           return _context5.stop();
       }
     }
-  }, null, null, [[0, 31]]);
+  }, null, null, [[0, 37]]);
 }); // get points table
 
 app.get("/pointstable/:year", function _callee6(req, res) {

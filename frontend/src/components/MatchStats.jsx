@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 export const MatchStats = (props) => {
     const parameters = useParams();
     const history = useHistory();
-    const { FirstBat, FirstBowl, SecondBat, SecondBowl, FirstBattingBowling, MatchInfo, Umpires, TeamOnePlayers, TeamTwoPlayers } = useContext(MatchContext)
+    const { FirstBat, FirstBowl, SecondBat, SecondBowl, FirstBattingBowling, MatchInfo, Umpires, TeamOnePlayers, TeamTwoPlayers, InningOneOvers, InningTwoOvers } = useContext(MatchContext)
     const [firstInningBat, setFirstInningBat] = FirstBat;
     const [firstInningBowl, setFirstInningBowl] = FirstBowl;
     const [secondInningBat, setSecondInningBat] = SecondBat;
@@ -17,6 +17,9 @@ export const MatchStats = (props) => {
     const [umpires, setUmpires] = Umpires;
     const [teamOnePlayers, setTeamOnePlayers] = TeamOnePlayers;
     const [teamTwoPlayers, setTeamTwoPlayers] = TeamTwoPlayers;
+    const [inningOneOvers, setinningOneOvers] = InningOneOvers;
+    const [inningTwoOvers, setinningTwoOvers] = InningTwoOvers;
+
 
     const ColoredLine = ({ color, height }) => (
     <hr
@@ -41,6 +44,8 @@ export const MatchStats = (props) => {
                 setUmpires(response.data.data.umpires);
                 setTeamOnePlayers(response.data.data.teamOnePlayers);
                 setTeamTwoPlayers(response.data.data.teamTwoPlayers);
+                setinningOneOvers(response.data.data.inningOneOvers);
+                setinningTwoOvers(response.data.data.inningTwoOvers)
             } 
             finally {
             }
@@ -132,7 +137,18 @@ export const MatchStats = (props) => {
     </b>
     </h3>
     </>
-    )})}</center>    
+    )})}
+    {inningOneOvers && inningOneOvers.map(el => {return(
+    <><h3>
+    <b>Overs: {el.over_id}.{el.ball_id}
+    <br/>
+    </b>
+    </h3>
+    </>
+    )})}
+    
+    
+    </center>    
 
 
     <ColoredLine color="grey" height={0.1}/>
@@ -211,7 +227,17 @@ export const MatchStats = (props) => {
     </b>
     </h3>
     </>
-    )})}</center>
+    )})}
+    
+    {inningTwoOvers && inningTwoOvers.map(el => {return(
+    <><h3>
+    <b>Overs: {el.over_id}.{el.ball_id}
+    <br/>
+    </b>
+    </h3>
+    </>
+    )})}
+    </center>
 
     </div>
 
