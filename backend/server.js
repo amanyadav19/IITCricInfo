@@ -331,7 +331,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
                 WHERE match_id = $1 AND innings_no=1 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
-                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                (SELECT bowler, SUM(runs_scored) AS runs_given
                 FROM ball_by_ball
                 WHERE match_id=$1 AND innings_no=1
                 GROUP BY bowler) AS t1
@@ -356,7 +356,7 @@ app.get("/matches/match_summary/:id", async (req, res) => {
                 WHERE match_id = $1 AND innings_no=2 AND out_type!='NULL' AND out_type!='retired hurt' AND out_type!='run out'
                 GROUP BY bowler) AS t0
             LEFT JOIN 
-                (SELECT bowler, SUM(runs_scored+extra_runs) AS runs_given
+                (SELECT bowler, SUM(runs_scored) AS runs_given
                 FROM ball_by_ball
                 WHERE match_id=$1 AND innings_no=2
                 GROUP BY bowler) AS t1
